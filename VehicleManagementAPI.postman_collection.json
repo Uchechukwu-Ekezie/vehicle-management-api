@@ -1,0 +1,495 @@
+{
+  "info": {
+    "name": "Vehicle Management API",
+    "description": "Complete API collection for Vehicle Management & Maintenance Tracker System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register Admin",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin123!\",\n  \"email\": \"admin@vms.com\",\n  \"fullName\": \"System Administrator\",\n  \"role\": \"Admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"token\", jsonData.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicles",
+      "item": [
+        {
+          "name": "Get All Vehicles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles"]
+            }
+          }
+        },
+        {
+          "name": "Get Vehicle by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get Vehicles by Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/status/Available",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles", "status", "Available"]
+            }
+          }
+        },
+        {
+          "name": "Create Vehicle",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"make\": \"Toyota\",\n  \"model\": \"Camry\",\n  \"year\": 2022,\n  \"vin\": \"1HGBH41JXMN109186\",\n  \"licensePlate\": \"ABC-1234\",\n  \"currentMileage\": 15000,\n  \"color\": \"Blue\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vehicles",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles"]
+            }
+          }
+        },
+        {
+          "name": "Update Vehicle",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Maintenance\",\n  \"currentMileage\": 15500\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles", "1"]
+            }
+          }
+        },
+        {
+          "name": "Assign Driver to Vehicle",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/1/assign/2",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles", "1", "assign", "2"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Trips",
+      "item": [
+        {
+          "name": "Start Trip",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicleID\": 1,\n  \"startTime\": \"2024-11-13T08:00:00Z\",\n  \"startMileage\": 15000,\n  \"notes\": \"Delivery route\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/trips/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["trips", "start"]
+            }
+          }
+        },
+        {
+          "name": "End Trip",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"endTime\": \"2024-11-13T10:00:00Z\",\n  \"endMileage\": 15120,\n  \"fuelUsed\": 8.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/trips/1/end",
+              "host": ["{{baseUrl}}"],
+              "path": ["trips", "1", "end"]
+            }
+          }
+        },
+        {
+          "name": "Get All Trips",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/trips",
+              "host": ["{{baseUrl}}"],
+              "path": ["trips"]
+            }
+          }
+        },
+        {
+          "name": "Get Trips by Vehicle",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/trips/vehicle/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["trips", "vehicle", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Maintenance",
+      "item": [
+        {
+          "name": "Schedule Maintenance",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicleID\": 1,\n  \"maintenanceType\": \"Oil Change\",\n  \"scheduledDate\": \"2024-11-20T09:00:00Z\",\n  \"cost\": 45.00,\n  \"mechanicNotes\": \"Regular scheduled maintenance\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/maintenance/schedule",
+              "host": ["{{baseUrl}}"],
+              "path": ["maintenance", "schedule"]
+            }
+          }
+        },
+        {
+          "name": "Get Maintenance Alerts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/maintenance/alerts",
+              "host": ["{{baseUrl}}"],
+              "path": ["maintenance", "alerts"]
+            }
+          }
+        },
+        {
+          "name": "Update Maintenance Record",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Completed\",\n  \"completionDate\": \"2024-11-20T11:00:00Z\",\n  \"mileageAtService\": 15500\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/maintenance/records/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["maintenance", "records", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Issues",
+      "item": [
+        {
+          "name": "Report Issue",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicleID\": 1,\n  \"description\": \"Strange noise from engine\",\n  \"priority\": \"High\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/issues",
+              "host": ["{{baseUrl}}"],
+              "path": ["issues"]
+            }
+          }
+        },
+        {
+          "name": "Get All Issues",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/issues",
+              "host": ["{{baseUrl}}"],
+              "path": ["issues"]
+            }
+          }
+        },
+        {
+          "name": "Update Issue",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Resolved\",\n  \"resolvedDate\": \"2024-11-14T10:00:00Z\",\n  \"resolution\": \"Replaced timing belt\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/issues/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["issues", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parts Inventory",
+      "item": [
+        {
+          "name": "Create Part",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Oil Filter\",\n  \"sku\": \"OF-123\",\n  \"quantityInStock\": 50,\n  \"unitPrice\": 12.99,\n  \"minimumStockLevel\": 10,\n  \"supplier\": \"AutoParts Inc\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/parts",
+              "host": ["{{baseUrl}}"],
+              "path": ["parts"]
+            }
+          }
+        },
+        {
+          "name": "Get Low Stock Parts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/parts/low-stock",
+              "host": ["{{baseUrl}}"],
+              "path": ["parts", "low-stock"]
+            }
+          }
+        },
+        {
+          "name": "Use Part Stock",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "2",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/parts/1/use",
+              "host": ["{{baseUrl}}"],
+              "path": ["parts", "1", "use"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Get Maintenance Cost Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/maintenance/costs?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "maintenance", "costs"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Fuel Efficiency Report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/fuel-efficiency",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "fuel-efficiency"]
+            }
+          }
+        },
+        {
+          "name": "Get Vehicle Fuel Efficiency",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/fuel-efficiency/vehicle/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "fuel-efficiency", "vehicle", "1"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

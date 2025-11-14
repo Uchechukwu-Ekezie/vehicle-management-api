@@ -1,0 +1,81 @@
+Table,Field,Type,Key,Nullable,Default,Description
+Users,UserID,INT,PK,No,AUTO_INCREMENT,Primary key - unique user identifier
+Users,Username,VARCHAR(100),UNIQUE,No,,Unique username for login
+Users,PasswordHash,VARCHAR(255),,No,,BCrypt hashed password
+Users,Role,VARCHAR(50),,No,,User role: Admin/Driver/Mechanic/Finance
+Users,Email,VARCHAR(100),UNIQUE,Yes,,User email address
+Users,FullName,VARCHAR(100),,Yes,,User's full name
+Users,CreatedAt,DATETIME,,No,CURRENT_TIMESTAMP,Account creation timestamp
+
+Vehicles,VehicleID,INT,PK,No,AUTO_INCREMENT,Primary key - unique vehicle identifier
+Vehicles,Make,VARCHAR(100),,No,,Vehicle manufacturer
+Vehicles,Model,VARCHAR(100),,No,,Vehicle model name
+Vehicles,Year,INT,,No,,Manufacturing year
+Vehicles,VIN,VARCHAR(17),UNIQUE,No,,Vehicle Identification Number
+Vehicles,LicensePlate,VARCHAR(20),UNIQUE,No,,License plate number
+Vehicles,Status,VARCHAR(50),,No,Available,Vehicle status: Available/In Use/Maintenance
+Vehicles,CurrentMileage,DECIMAL(10,2),,No,,Current odometer reading
+Vehicles,AssignedDriverID,INT,FK,Yes,,Foreign key to Users table
+Vehicles,Color,VARCHAR(50),,Yes,,Vehicle color
+Vehicles,PurchaseDate,DATETIME,,Yes,,Date vehicle was purchased
+Vehicles,CreatedAt,DATETIME,,No,CURRENT_TIMESTAMP,Record creation timestamp
+Vehicles,UpdatedAt,DATETIME,,No,CURRENT_TIMESTAMP,Last update timestamp
+
+Trips,TripID,INT,PK,No,AUTO_INCREMENT,Primary key - unique trip identifier
+Trips,VehicleID,INT,FK,No,,Foreign key to Vehicles table
+Trips,DriverID,INT,FK,No,,Foreign key to Users table
+Trips,StartTime,DATETIME,,No,,Trip start date and time
+Trips,EndTime,DATETIME,,Yes,,Trip end date and time
+Trips,StartMileage,DECIMAL(10,2),,No,,Odometer reading at trip start
+Trips,EndMileage,DECIMAL(10,2),,Yes,,Odometer reading at trip end
+Trips,FuelUsed,DECIMAL(10,2),,Yes,,Fuel consumed during trip
+Trips,FuelEfficiency,DECIMAL(10,2),,Yes,,Calculated miles per gallon/km per liter
+Trips,Notes,VARCHAR(500),,Yes,,Optional trip notes
+Trips,CreatedAt,DATETIME,,No,CURRENT_TIMESTAMP,Record creation timestamp
+
+MaintenanceRecords,RecordID,INT,PK,No,AUTO_INCREMENT,Primary key - unique maintenance record identifier
+MaintenanceRecords,VehicleID,INT,FK,No,,Foreign key to Vehicles table
+MaintenanceRecords,MaintenanceType,VARCHAR(100),,No,,Type: Service/Repair/Inspection/etc
+MaintenanceRecords,ScheduledDate,DATETIME,,No,,Scheduled maintenance date
+MaintenanceRecords,CompletionDate,DATETIME,,Yes,,Actual completion date
+MaintenanceRecords,Cost,DECIMAL(10,2),,No,0.00,Maintenance cost
+MaintenanceRecords,MechanicNotes,VARCHAR(1000),,Yes,,Mechanic's notes and observations
+MaintenanceRecords,PartsUsedID,INT,FK,Yes,,Foreign key to PartsInventory table
+MaintenanceRecords,Status,VARCHAR(50),,No,Scheduled,Status: Scheduled/In Progress/Completed/Cancelled
+MaintenanceRecords,MileageAtService,DECIMAL(10,2),,Yes,,Odometer reading during service
+MaintenanceRecords,CreatedAt,DATETIME,,No,CURRENT_TIMESTAMP,Record creation timestamp
+MaintenanceRecords,UpdatedAt,DATETIME,,No,CURRENT_TIMESTAMP,Last update timestamp
+
+Inspections,InspectionID,INT,PK,No,AUTO_INCREMENT,Primary key - unique inspection identifier
+Inspections,VehicleID,INT,FK,No,,Foreign key to Vehicles table
+Inspections,InspectionType,VARCHAR(100),,No,,Type: MOT/Insurance/Tax/Safety
+Inspections,DueDate,DATETIME,,No,,Inspection due date
+Inspections,CompletionDate,DATETIME,,Yes,,Actual completion date
+Inspections,IsCompliant,BOOLEAN,,No,FALSE,Compliance status
+Inspections,DocumentLink,VARCHAR(500),,Yes,,Link to inspection certificate/document
+Inspections,Notes,VARCHAR(1000),,Yes,,Additional notes
+Inspections,CreatedAt,DATETIME,,No,CURRENT_TIMESTAMP,Record creation timestamp
+Inspections,UpdatedAt,DATETIME,,No,CURRENT_TIMESTAMP,Last update timestamp
+
+Issues,IssueID,INT,PK,No,AUTO_INCREMENT,Primary key - unique issue identifier
+Issues,VehicleID,INT,FK,No,,Foreign key to Vehicles table
+Issues,ReportedByID,INT,FK,No,,Foreign key to Users table
+Issues,ReportDate,DATETIME,,No,CURRENT_TIMESTAMP,Date issue was reported
+Issues,Description,VARCHAR(1000),,No,,Issue description
+Issues,Status,VARCHAR(50),,No,Reported,Status: Reported/In Progress/Resolved/Closed
+Issues,Priority,VARCHAR(50),,Yes,Medium,Priority: Low/Medium/High/Critical
+Issues,ResolvedDate,DATETIME,,Yes,,Date issue was resolved
+Issues,Resolution,VARCHAR(1000),,Yes,,Resolution description
+Issues,CreatedAt,DATETIME,,No,CURRENT_TIMESTAMP,Record creation timestamp
+Issues,UpdatedAt,DATETIME,,No,CURRENT_TIMESTAMP,Last update timestamp
+
+PartsInventory,PartID,INT,PK,No,AUTO_INCREMENT,Primary key - unique part identifier
+PartsInventory,Name,VARCHAR(200),,No,,Part name
+PartsInventory,SKU,VARCHAR(100),UNIQUE,No,,Stock Keeping Unit - unique identifier
+PartsInventory,QuantityInStock,INT,,No,0,Current stock quantity
+PartsInventory,UnitPrice,DECIMAL(10,2),,No,0.00,Price per unit
+PartsInventory,MinimumStockLevel,INT,,Yes,,Minimum stock level for alerts
+PartsInventory,Supplier,VARCHAR(100),,Yes,,Supplier name
+PartsInventory,Description,VARCHAR(500),,Yes,,Part description
+PartsInventory,CreatedAt,DATETIME,,No,CURRENT_TIMESTAMP,Record creation timestamp
+PartsInventory,UpdatedAt,DATETIME,,No,CURRENT_TIMESTAMP,Last update timestamp

@@ -1,0 +1,64 @@
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+*.swp
+*.*~
+project.lock.json
+.DS_Store
+*.pyc
+
+# Visual Studio
+.vscode/
+.idea/
+*.sln.DotSettings.user
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NuGet Packages
+*.nupkg
+**/packages/*
+!**/packages/build/
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# Migrations (optional - remove if you want to track migrations)
+# **/Migrations/
+
+# User-specific files
+appsettings.Development.json
+appsettings.Production.json
+*.user
+*.rsuser
+
+# Logs
+logs/
+*.log
