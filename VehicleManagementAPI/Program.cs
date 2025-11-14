@@ -105,7 +105,7 @@ builder.Services.AddCors(options =>
         // Get allowed origins from environment or use defaults
         var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
             ?? new[] { "http://localhost:3000", "http://localhost:5173" };
-        
+
         policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
@@ -114,6 +114,26 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Run database migrations automatically on startup (Railway deployment)
+if (app.Environment.IsProduction())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            var context = services.GetRequiredService<ApplicationDbContext>();
+            context.Database.Migrate();
+            Console.WriteLine("Database migrations applied successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error applying migrations: {ex.Message}");
+            // Don't throw - allow app to start even if migrations fail
+        }
+    }
+}
 
 // Configure the HTTP request pipeline
 // Enable Swagger in all environments for API documentation
