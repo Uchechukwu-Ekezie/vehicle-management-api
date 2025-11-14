@@ -3,16 +3,16 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy csproj and restore dependencies
-COPY ["VehicleManagementAPI.csproj", "./"]
-RUN dotnet restore "VehicleManagementAPI.csproj"
+COPY ["VehicleManagementAPI/VehicleManagementAPI.csproj", "VehicleManagementAPI/"]
+RUN dotnet restore "VehicleManagementAPI/VehicleManagementAPI.csproj"
 
 # Copy everything else and build
-COPY . .
-RUN dotnet build "VehicleManagementAPI.csproj" -c Release -o /app/build
+COPY ["VehicleManagementAPI/", "VehicleManagementAPI/"]
+RUN dotnet build "VehicleManagementAPI/VehicleManagementAPI.csproj" -c Release -o /app/build
 
 # Publish the app
 FROM build AS publish
-RUN dotnet publish "VehicleManagementAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "VehicleManagementAPI/VehicleManagementAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Use the ASP.NET runtime image for running
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
