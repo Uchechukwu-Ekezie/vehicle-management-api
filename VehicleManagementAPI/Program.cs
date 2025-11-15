@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MySqlConnector;
 using System.Text;
 using VehicleManagementAPI.Data;
 using VehicleManagementAPI.Services;
@@ -63,6 +64,15 @@ var serverVersion = new MySqlServerVersion(new Version(8, 0, 0));
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, serverVersion));
 
+// Register services for dependency injection
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IVehicleService, VehicleService>();
+builder.Services.AddScoped<ITripService, TripService>();
+builder.Services.AddScoped<IMaintenanceService, MaintenanceService>();
+builder.Services.AddScoped<IIssueService, IssueService>();
+builder.Services.AddScoped<IPartsService, PartsService>();
+builder.Services.AddScoped<IReportingService, ReportingService>();
+
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"] ?? throw new Exception("JWT SecretKey not configured");
@@ -88,14 +98,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// Register services for dependency injection
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IVehicleService, VehicleService>();
-builder.Services.AddScoped<ITripService, TripService>();
-builder.Services.AddScoped<IMaintenanceService, MaintenanceService>();
-builder.Services.AddScoped<IIssueService, IssueService>();
-builder.Services.AddScoped<IPartsService, PartsService>();
-builder.Services.AddScoped<IReportingService, ReportingService>();
+
 
 // Add CORS for frontend - supports both development and production
 builder.Services.AddCors(options =>

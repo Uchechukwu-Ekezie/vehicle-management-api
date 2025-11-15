@@ -19,6 +19,7 @@ export default function SignupPage() {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
+    fullName: "",
     password: "",
     confirmPassword: "",
     role: "Driver",
@@ -75,6 +76,7 @@ export default function SignupPage() {
       await authApi.register({
         username: formData.username,
         email: formData.email,
+        fullName: formData.fullName,
         password: formData.password,
         role: formData.role,
       });
@@ -202,6 +204,26 @@ export default function SignupPage() {
                     className="h-12 text-base"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="fullName"
+                  className="text-sm font-semibold text-gray-700"
+                >
+                  Full Name *
+                </label>
+                <Input
+                  id="fullName"
+                  name="fullName"
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                  className="h-12 text-base"
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

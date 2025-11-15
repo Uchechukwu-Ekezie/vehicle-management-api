@@ -27,6 +27,7 @@ export const authApi = {
   register: async (data: {
     username: string;
     email: string;
+    fullName: string;
     password: string;
     role: string;
   }) => {
@@ -37,13 +38,21 @@ export const authApi = {
 
 // Helper function to normalize vehicle data from API
 // Backend uses camelCase by default in .NET 8 (vehicleID, currentMileage, etc.)
+// IDs are now UUIDs (Guid) which come as strings in JSON
 const normalizeVehicle = (vehicle: any) => {
   if (!vehicle) return vehicle;
 
+  // Convert UUID to string if needed
+  const normalizeId = (id: any) => {
+    if (id === null || id === undefined) return undefined;
+    return typeof id === 'string' ? id : id.toString();
+  };
+
   return {
     ...vehicle,
-    // ID mapping: prioritize camelCase (vehicleID) as that's what .NET 8 returns
-    id: vehicle.id ?? vehicle.vehicleID ?? vehicle.VehicleID,
+    // ID mapping: prioritize camelCase (vehicleID) as that's what .NET 8 returns, convert to string
+    id: normalizeId(vehicle.id) ?? normalizeId(vehicle.vehicleID) ?? normalizeId(vehicle.VehicleID) ?? "",
+    vehicleID: normalizeId(vehicle.vehicleID) ?? normalizeId(vehicle.VehicleID),
     // Mileage mapping: backend uses currentMileage (camelCase)
     mileage:
       vehicle.mileage ?? vehicle.currentMileage ?? vehicle.CurrentMileage ?? 0,
@@ -56,6 +65,8 @@ const normalizeVehicle = (vehicle: any) => {
     model: vehicle.model ?? vehicle.Model ?? "",
     year: vehicle.year ?? vehicle.Year ?? new Date().getFullYear(),
     status: vehicle.status ?? vehicle.Status ?? "Available",
+    // Convert assignedDriverID to string if present
+    assignedDriverID: vehicle.assignedDriverID ? normalizeId(vehicle.assignedDriverID) : vehicle.assignedDriverID,
   };
 };
 
@@ -68,7 +79,7 @@ export const vehiclesApi = {
     const vehicles = Array.isArray(response.data) ? response.data : [];
     return vehicles.map(normalizeVehicle);
   },
-  getById: async (id: number, token: string) => {
+  getById: async (id: string, token: string) => {
     const response = await api.get(`/api/Vehicles/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -90,7 +101,7 @@ export const vehiclesApi = {
     });
     return normalizeVehicle(response.data);
   },
-  update: async (id: number, data: any, token: string) => {
+  update: async (id: string, data: any, token: string) => {
     // Map frontend fields to backend DTO fields
     const backendData = {
       ...data,
@@ -99,13 +110,13 @@ export const vehiclesApi = {
     // Remove frontend-specific fields if they exist
     delete backendData.mileage;
     delete backendData.id;
-
+    
     const response = await api.put(`/api/Vehicles/${id}`, backendData, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return normalizeVehicle(response.data);
   },
-  delete: async (id: number, token: string) => {
+  delete: async (id: string, token: string) => {
     await api.delete(`/api/Vehicles/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });

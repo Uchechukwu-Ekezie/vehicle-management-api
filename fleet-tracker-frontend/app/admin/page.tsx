@@ -46,12 +46,13 @@ async function getDashboardData(token: string) {
       })
       .map(
         (v: {
-          id: number;
+          id: string;
+          vehicleID?: string;
           make: string;
           model: string;
           licensePlate: string;
         }) => ({
-          id: v.id,
+          id: v.id || v.vehicleID || "",
           vehicle: `${v.make} ${v.model} (${v.licensePlate})`,
           message: "Service recommended",
         })

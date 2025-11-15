@@ -16,13 +16,14 @@ export interface LoginCredentials {
 export interface RegisterData {
   username: string;
   email: string;
+  fullName: string;
   password: string;
   role: string;
 }
 
 export interface Vehicle {
-  id: number;
-  vehicleID?: number; // API may return this
+  id: string; // UUID as string
+  vehicleID?: string; // API may return this (UUID)
   make: string;
   model: string;
   year: number;
@@ -33,16 +34,16 @@ export interface Vehicle {
   status: "Available" | "InUse" | "UnderMaintenance" | "OutOfService";
   lastServiceDate?: string;
   nextServiceDue?: string;
-  assignedDriverID?: number | null;
+  assignedDriverID?: string | null; // UUID as string
   assignedDriverName?: string | null;
   color?: string | null;
   purchaseDate?: string | null;
 }
 
 export interface Trip {
-  id: number;
-  vehicleId: number;
-  driverId: number;
+  id: string; // UUID as string
+  vehicleId: string; // UUID as string
+  driverId: string; // UUID as string
   startDate: string;
   endDate?: string;
   startMileage: number;
@@ -52,21 +53,21 @@ export interface Trip {
 }
 
 export interface MaintenanceRecord {
-  id: number;
-  vehicleId: number;
+  id: string; // UUID as string
+  vehicleId: string; // UUID as string
   maintenanceType: string;
   description: string;
   scheduledDate: string;
   completedDate?: string;
   cost?: number;
-  mechanicId?: number;
+  mechanicId?: string; // UUID as string
   status: "Scheduled" | "InProgress" | "Completed" | "Cancelled";
 }
 
 export interface Issue {
-  id: number;
-  vehicleId: number;
-  reportedById: number;
+  id: string; // UUID as string
+  vehicleId: string; // UUID as string
+  reportedById: string; // UUID as string
   description: string;
   severity: "Low" | "Medium" | "High" | "Critical";
   status: "Open" | "InProgress" | "Resolved" | "Closed";
@@ -75,11 +76,19 @@ export interface Issue {
 }
 
 export interface PartsInventory {
-  id: number;
+  id: string; // UUID as string
   partName: string;
   partNumber: string;
   quantity: number;
   minStockLevel: number;
   unitCost: number;
-  supplierId?: number;
+  supplierId?: string; // UUID as string
+}
+
+export interface User {
+  id: string; // UUID as string
+  username: string;
+  email: string;
+  role: "Admin" | "Driver" | "Mechanic" | "Finance";
+  token: string;
 }

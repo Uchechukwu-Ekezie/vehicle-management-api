@@ -72,7 +72,7 @@ export default function VehiclesPage() {
     }
   }, [vehicles, searchTerm, statusFilter, filteredVehicles]);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this vehicle?")) return;
 
     try {
@@ -504,7 +504,7 @@ export default function VehiclesPage() {
                     variant="outline"
                     className="text-red-600 hover:bg-red-50 hover:border-red-300"
                     onClick={() =>
-                      handleDelete(vehicle.id || vehicle.vehicleID || 0)
+                      handleDelete(vehicle.id || vehicle.vehicleID || "")
                     }
                   >
                     <svg

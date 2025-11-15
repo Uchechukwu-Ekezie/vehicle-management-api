@@ -26,7 +26,7 @@ export default function AddEditVehiclePage() {
     status: "Available" as Vehicle["status"],
   });
 
-  const loadVehicle = async (id: number) => {
+  const loadVehicle = async (id: string) => {
     try {
       const token =
         document.cookie
@@ -50,9 +50,9 @@ export default function AddEditVehiclePage() {
 
   useEffect(() => {
     if (isEditing && vehicleId) {
-      const parsedId = parseInt(vehicleId);
-      if (!isNaN(parsedId)) {
-        loadVehicle(parsedId);
+      // vehicleId is now a UUID string, not a number
+      if (vehicleId) {
+        loadVehicle(vehicleId);
       } else {
         setError("Invalid vehicle ID");
       }
@@ -73,14 +73,8 @@ export default function AddEditVehiclePage() {
           ?.split("=")[1] || "";
 
       if (isEditing && vehicleId) {
-        const parsedId = parseInt(vehicleId);
-        if (!isNaN(parsedId)) {
-          await vehiclesApi.update(parsedId, formData, token);
-        } else {
-          setError("Invalid vehicle ID");
-          setLoading(false);
-          return;
-        }
+        // vehicleId is now a UUID string, not a number
+        await vehiclesApi.update(vehicleId, formData, token);
       } else {
         await vehiclesApi.create(formData, token);
       }
