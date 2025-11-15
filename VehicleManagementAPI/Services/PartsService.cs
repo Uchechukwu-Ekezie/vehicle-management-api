@@ -8,12 +8,12 @@ namespace VehicleManagementAPI.Services;
 public interface IPartsService
 {
     Task<List<PartsInventoryDTO>> GetAllPartsAsync();
-    Task<PartsInventoryDTO?> GetPartByIdAsync(int id);
+    Task<PartsInventoryDTO?> GetPartByIdAsync(Guid id);
     Task<List<PartsInventoryDTO>> GetLowStockPartsAsync();
     Task<PartsInventoryDTO> CreatePartAsync(CreatePartRequest request);
-    Task<PartsInventoryDTO?> UpdatePartAsync(int id, UpdatePartRequest request);
-    Task<bool> DeletePartAsync(int id);
-    Task<bool> UpdateStockAsync(int partId, int quantity);
+    Task<PartsInventoryDTO?> UpdatePartAsync(Guid id, UpdatePartRequest request);
+    Task<bool> DeletePartAsync(Guid id);
+    Task<bool> UpdateStockAsync(Guid partId, int quantity);
 }
 
 public class PartsService : IPartsService
@@ -32,7 +32,7 @@ public class PartsService : IPartsService
             .ToListAsync();
     }
 
-    public async Task<PartsInventoryDTO?> GetPartByIdAsync(int id)
+    public async Task<PartsInventoryDTO?> GetPartByIdAsync(Guid id)
     {
         var part = await _context.PartsInventory.FindAsync(id);
         return part == null ? null : MapToDTO(part);
@@ -50,6 +50,7 @@ public class PartsService : IPartsService
     {
         var part = new PartsInventory
         {
+            PartID = Guid.NewGuid(), // Generate UUID
             Name = request.Name,
             SKU = request.SKU,
             QuantityInStock = request.QuantityInStock,
@@ -67,7 +68,7 @@ public class PartsService : IPartsService
         return MapToDTO(part);
     }
 
-    public async Task<PartsInventoryDTO?> UpdatePartAsync(int id, UpdatePartRequest request)
+    public async Task<PartsInventoryDTO?> UpdatePartAsync(Guid id, UpdatePartRequest request)
     {
         var part = await _context.PartsInventory.FindAsync(id);
         if (part == null) return null;
@@ -86,7 +87,7 @@ public class PartsService : IPartsService
         return MapToDTO(part);
     }
 
-    public async Task<bool> DeletePartAsync(int id)
+    public async Task<bool> DeletePartAsync(Guid id)
     {
         var part = await _context.PartsInventory.FindAsync(id);
         if (part == null) return false;
@@ -98,7 +99,7 @@ public class PartsService : IPartsService
     }
 
     // MECHANIC ENHANCEMENT - Update stock when parts are used
-    public async Task<bool> UpdateStockAsync(int partId, int quantity)
+    public async Task<bool> UpdateStockAsync(Guid partId, int quantity)
     {
         var part = await _context.PartsInventory.FindAsync(partId);
         if (part == null) return false;

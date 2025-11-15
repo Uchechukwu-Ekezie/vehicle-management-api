@@ -64,6 +64,7 @@ public class MaintenanceService : IMaintenanceService
 
         var record = new MaintenanceRecord
         {
+            RecordID = Guid.NewGuid(), // Generate UUID
             VehicleID = request.VehicleID,
             MaintenanceType = request.MaintenanceType,
             ScheduledDate = request.ScheduledDate,

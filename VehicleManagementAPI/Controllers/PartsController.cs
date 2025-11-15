@@ -25,7 +25,7 @@ public class PartsController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<PartsInventoryDTO>> GetPartById(int id)
+    public async Task<ActionResult<PartsInventoryDTO>> GetPartById(Guid id)
     {
         var part = await _partsService.GetPartByIdAsync(id);
         if (part == null)
@@ -57,7 +57,7 @@ public class PartsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<PartsInventoryDTO>> UpdatePart(int id, [FromBody] UpdatePartRequest request)
+    public async Task<ActionResult<PartsInventoryDTO>> UpdatePart(Guid id, [FromBody] UpdatePartRequest request)
     {
         var part = await _partsService.UpdatePartAsync(id, request);
         if (part == null)
@@ -68,7 +68,7 @@ public class PartsController : ControllerBase
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> DeletePart(int id)
+    public async Task<ActionResult> DeletePart(Guid id)
     {
         var result = await _partsService.DeletePartAsync(id);
         if (!result)
@@ -78,7 +78,7 @@ public class PartsController : ControllerBase
     }
 
     [HttpPost("{id}/use")]
-    public async Task<ActionResult> UsePartStock(int id, [FromBody] int quantity)
+    public async Task<ActionResult> UsePartStock(Guid id, [FromBody] int quantity)
     {
         var result = await _partsService.UpdateStockAsync(id, quantity);
         if (!result)

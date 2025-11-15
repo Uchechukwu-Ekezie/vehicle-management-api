@@ -72,6 +72,7 @@ public class IssueService : IIssueService
 
         var issue = new Issue
         {
+            IssueID = Guid.NewGuid(), // Generate UUID
             VehicleID = request.VehicleID,
             ReportedByID = reportedById,
             ReportDate = DateTime.UtcNow,
