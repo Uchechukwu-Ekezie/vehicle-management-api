@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { vehiclesApi, issuesApi } from "@/lib/api";
+import { getUserFromToken } from "@/lib/auth";
 import { Vehicle } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
@@ -42,16 +43,26 @@ export default function DriverIssuesPage() {
           .find((row) => row.startsWith("token="))
           ?.split("=")[1] || "";
 
+      // Get user info from token to get driver ID
+      const user = getUserFromToken(token);
+      if (!user || !user.id) {
+        setLoading(false);
+        return;
+      }
+
+      const driverId = user.id as string;
+
       // Get assigned vehicle
       const vehicles = await vehiclesApi.getAll(token);
       const assigned = vehicles.find((v: Vehicle) => v.status === "InUse");
       setAssignedVehicle(assigned || null);
 
-      // Get all issues
-      const allIssues = await issuesApi.getAll(token);
-      setIssues(allIssues);
+      // Get driver's reported issues (not all issues - drivers can only see their own)
+      const driverIssues = await issuesApi.getByReportedBy(driverId, token);
+      setIssues(driverIssues);
       setLoading(false);
-    } catch {
+    } catch (error) {
+      console.error("Error loading issues:", error);
       setLoading(false);
     }
   };
@@ -68,14 +79,13 @@ export default function DriverIssuesPage() {
           .find((row) => row.startsWith("token="))
           ?.split("=")[1] || "";
 
+      // Backend expects CreateIssueRequest: vehicleID, description, priority
+      // Backend extracts reportedById from JWT token automatically
       await issuesApi.create(
         {
           vehicleId: assignedVehicle.id,
-          reportedBy: "Driver", // This should come from auth context
-          severity: formData.severity,
           description: formData.description,
-          status: "Open",
-          reportedDate: new Date().toISOString(),
+          priority: formData.severity, // Map severity to priority (Low, Medium, High, Critical)
         },
         token
       );

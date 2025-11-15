@@ -14,7 +14,7 @@ export default function AdminMaintenancePage() {
   const [maintenance, setMaintenance] = useState<MaintenanceRecord[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [formData, setFormData] = useState({
-    vehicleId: 0,
+    vehicleId: "",
     maintenanceType: "",
     description: "",
     scheduledDate: new Date().toISOString().split("T")[0],
@@ -53,17 +53,21 @@ export default function AdminMaintenancePage() {
           .find((row) => row.startsWith("token="))
           ?.split("=")[1] || "";
 
+      // Map frontend fields to backend DTO fields
+      // Backend expects camelCase JSON: vehicleID, maintenanceType, scheduledDate, cost, mechanicNotes
       await maintenanceApi.create(
         {
-          ...formData,
-          status: "Scheduled",
+          vehicleID: formData.vehicleId, // UUID as string
+          maintenanceType: formData.maintenanceType,
           scheduledDate: new Date(formData.scheduledDate).toISOString(),
+          cost: formData.cost,
+          mechanicNotes: formData.description, // Map description to mechanicNotes
         },
         token
       );
 
       setFormData({
-        vehicleId: 0,
+        vehicleId: "",
         maintenanceType: "",
         description: "",
         scheduledDate: new Date().toISOString().split("T")[0],
@@ -182,13 +186,13 @@ export default function AdminMaintenancePage() {
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        vehicleId: parseInt(e.target.value),
+                        vehicleId: e.target.value, // UUID is a string
                       })
                     }
                     required
                     className="w-full h-12 px-3 rounded-md border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                   >
-                    <option value={0}>Select a vehicle...</option>
+                    <option value="">Select a vehicle...</option>
                     {vehicles.map((vehicle) => (
                       <option key={vehicle.id} value={vehicle.id}>
                         {vehicle.make} {vehicle.model} - {vehicle.licensePlate}
@@ -379,7 +383,7 @@ export default function AdminMaintenancePage() {
           ) : (
             <div className="text-center py-12">
               <svg
-                className="w-20 h-20 text-gray-300 mx-auto mb-4"
+                className="w-20 h-20 text-gray-600 mx-auto mb-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -394,7 +398,7 @@ export default function AdminMaintenancePage() {
               <p className="text-gray-600 text-lg">
                 No upcoming maintenance scheduled
               </p>
-              <p className="text-gray-500 text-sm mt-2">
+              <p className="text-gray-700 text-base mt-2">
                 Click &quot;Schedule Maintenance&quot; to add a new task
               </p>
             </div>
@@ -464,7 +468,7 @@ export default function AdminMaintenancePage() {
           ) : (
             <div className="text-center py-12">
               <svg
-                className="w-16 h-16 text-gray-300 mx-auto mb-4"
+                className="w-16 h-16 text-gray-600 mx-auto mb-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

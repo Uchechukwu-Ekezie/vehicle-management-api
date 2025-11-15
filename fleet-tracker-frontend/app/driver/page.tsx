@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { vehiclesApi, tripsApi, maintenanceApi } from "@/lib/api";
+import { getUserFromToken } from "@/lib/auth";
 import { Vehicle, Trip, MaintenanceRecord } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
@@ -29,13 +30,22 @@ export default function DriverDashboardPage() {
             .find((row) => row.startsWith("token="))
             ?.split("=")[1] || "";
 
+        // Get user info from token to get driver ID
+        const user = getUserFromToken(token);
+        if (!user || !user.id) {
+          setLoading(false);
+          return;
+        }
+
+        const driverId = user.id as string;
+
         // Get driver's assigned vehicle
         const vehicles = await vehiclesApi.getAll(token);
         const assigned = vehicles.find((v: Vehicle) => v.status === "InUse"); // In real app, filter by driver ID
         setAssignedVehicle(assigned || null);
 
-        // Get recent trips
-        const trips = await tripsApi.getAll(token);
+        // Get driver's trips (not all trips - drivers can only see their own)
+        const trips = await tripsApi.getByDriver(driverId, token);
         setRecentTrips(trips.slice(0, 5)); // Get last 5 trips
 
         // Calculate stats

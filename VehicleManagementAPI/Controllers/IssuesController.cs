@@ -43,6 +43,13 @@ public class IssuesController : ControllerBase
         return Ok(issues);
     }
 
+    [HttpGet("reported/{reportedById}")]
+    public async Task<ActionResult<List<IssueDTO>>> GetIssuesByReportedBy(Guid reportedById)
+    {
+        var issues = await _issueService.GetIssuesByReportedByAsync(reportedById);
+        return Ok(issues);
+    }
+
     [HttpGet("status/{status}")]
     [Authorize(Roles = "Admin,Mechanic")]
     public async Task<ActionResult<List<IssueDTO>>> GetIssuesByStatus(string status)

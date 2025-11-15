@@ -5,12 +5,19 @@
 -- This will drop all tables and allow fresh migrations
 
 DROP TABLE IF EXISTS `Trips`;
+
 DROP TABLE IF EXISTS `Issues`;
+
 DROP TABLE IF EXISTS `MaintenanceRecords`;
+
 DROP TABLE IF EXISTS `Inspections`;
+
 DROP TABLE IF EXISTS `PartsInventory`;
+
 DROP TABLE IF EXISTS `Vehicles`;
+
 DROP TABLE IF EXISTS `Users`;
+
 DROP TABLE IF EXISTS `__EFMigrationsHistory`;
 
 -- Verify tables are gone

@@ -13,6 +13,7 @@ import {
   LogOut,
   Menu,
   X,
+  FileCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { removeTokenCookie, decodeToken } from "@/lib/auth";
@@ -27,30 +28,38 @@ interface NavItem {
 
 interface SidebarProps {
   role: "Admin" | "Driver" | "Mechanic" | "Finance";
+  username?: string;
 }
 
-export function Sidebar({ role }: SidebarProps) {
+export function Sidebar({ role, username: usernameProp }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [username, setUsername] = useState("User");
+  const [username, setUsername] = useState(usernameProp || "User");
 
   useEffect(() => {
-    const token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("token="))
-      ?.split("=")[1];
-    if (token) {
-      const decoded = decodeToken(token);
-      if (decoded && typeof decoded === "object") {
-        const name =
-          (decoded as Record<string, unknown>).unique_name ||
-          (decoded as Record<string, unknown>).sub ||
-          "User";
-        setUsername(String(name));
+    // Use prop if provided, otherwise decode from token
+    if (usernameProp) {
+      setUsername(usernameProp);
+    } else {
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="))
+        ?.split("=")[1];
+      if (token) {
+        const decoded = decodeToken(token);
+        if (decoded && typeof decoded === "object") {
+          // Backend uses ClaimTypes.Name which maps to "name" or "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+          const name =
+            (decoded as Record<string, unknown>).name ||
+            (decoded as Record<string, unknown>).unique_name ||
+            (decoded as Record<string, unknown>).username ||
+            "User";
+          setUsername(String(name));
+        }
       }
     }
-  }, []);
+  }, [usernameProp]);
 
   const handleLogout = () => {
     removeTokenCookie();
@@ -77,6 +86,11 @@ export function Sidebar({ role }: SidebarProps) {
             title: "Maintenance",
             href: `${baseRoute}/maintenance`,
             icon: <Wrench className="h-5 w-5" />,
+          },
+          {
+            title: "Inspections",
+            href: `${baseRoute}/inspections`,
+            icon: <FileCheck className="h-5 w-5" />,
           },
           {
             title: "Reports",
@@ -160,7 +174,7 @@ export function Sidebar({ role }: SidebarProps) {
             </svg>
             Fleet Tracker
           </h1>
-          <p className="text-sm text-blue-100 mt-1 font-medium">
+          <p className="text-base text-white/95 mt-1 font-medium">
             {role} Portal
           </p>
         </div>

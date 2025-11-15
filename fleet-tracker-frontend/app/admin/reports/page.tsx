@@ -360,7 +360,7 @@ export default function AdminReportsPage() {
                   <p className="text-4xl font-bold text-purple-600">
                     {Math.round(fleetStats.avgMileage).toLocaleString()}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">miles</p>
+                  <p className="text-sm text-gray-700 mt-1">miles</p>
                 </div>
               </CardContent>
             </Card>
@@ -474,7 +474,7 @@ export default function AdminReportsPage() {
                   <p className="text-4xl font-bold text-purple-600">
                     {Math.round(tripStats.totalDistance).toLocaleString()}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">miles</p>
+                  <p className="text-sm text-gray-700 mt-1">miles</p>
                 </div>
               </CardContent>
             </Card>
@@ -485,7 +485,7 @@ export default function AdminReportsPage() {
                   <p className="text-4xl font-bold text-orange-600">
                     {tripStats.totalFuel.toFixed(1)}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">gallons</p>
+                  <p className="text-sm text-gray-700 mt-1">gallons</p>
                 </div>
               </CardContent>
             </Card>
@@ -496,7 +496,7 @@ export default function AdminReportsPage() {
                   <p className="text-4xl font-bold text-teal-600">
                     {tripStats.avgEfficiency.toFixed(1)}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">MPG</p>
+                  <p className="text-sm text-gray-700 mt-1">MPG</p>
                 </div>
               </CardContent>
             </Card>

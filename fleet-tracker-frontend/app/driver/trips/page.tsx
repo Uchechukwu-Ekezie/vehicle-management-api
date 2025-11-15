@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { vehiclesApi, tripsApi } from "@/lib/api";
+import { getUserFromToken } from "@/lib/auth";
 import { Vehicle, Trip } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
@@ -35,16 +36,26 @@ export default function DriverTripsPage() {
           .find((row) => row.startsWith("token="))
           ?.split("=")[1] || "";
 
+      // Get user info from token to get driver ID
+      const user = getUserFromToken(token);
+      if (!user || !user.id) {
+        setLoading(false);
+        return;
+      }
+
+      const driverId = user.id as string;
+
       // Get assigned vehicle
       const vehicles = await vehiclesApi.getAll(token);
       const assigned = vehicles.find((v: Vehicle) => v.status === "InUse");
       setAssignedVehicle(assigned || null);
 
-      // Get all trips
-      const allTrips = await tripsApi.getAll(token);
-      setTrips(allTrips);
+      // Get driver's trips (not all trips - drivers can only see their own)
+      const driverTrips = await tripsApi.getByDriver(driverId, token);
+      setTrips(driverTrips);
       setLoading(false);
-    } catch {
+    } catch (error) {
+      console.error("Error loading trips:", error);
       setLoading(false);
     }
   };
@@ -62,26 +73,25 @@ export default function DriverTripsPage() {
           ?.split("=")[1] || "";
 
       if (editingTrip) {
-        // End trip
+        // End trip - backend expects EndTripRequest: endTime, endMileage, fuelUsed
         await tripsApi.update(
           editingTrip.id,
           {
-            ...editingTrip,
-            endDate: new Date().toISOString(),
+            endTime: new Date().toISOString(),
             endMileage: formData.endMileage,
-            fuelUsed: formData.fuelUsed,
+            fuelUsed: formData.fuelUsed > 0 ? formData.fuelUsed : undefined,
           },
           token
         );
       } else {
-        // Start new trip
+        // Start new trip - backend expects CreateTripRequest: vehicleID, startTime, startMileage, notes
+        // Backend extracts driverId from JWT token
         await tripsApi.create(
           {
-            vehicleId: assignedVehicle.id,
-            driverId: 1, // This should come from auth context
-            startDate: new Date().toISOString(),
+            vehicleID: assignedVehicle.id,
+            startTime: new Date().toISOString(),
             startMileage: formData.startMileage,
-            purpose: formData.purpose,
+            notes: formData.purpose || undefined, // Map purpose to notes
           },
           token
         );

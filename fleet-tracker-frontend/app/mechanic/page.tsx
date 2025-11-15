@@ -251,7 +251,7 @@ export default function MechanicDashboardPage() {
                   </p>
                 </div>
                 <svg
-                  className="w-6 h-6 text-gray-400"
+                  className="w-6 h-6 text-gray-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -296,7 +296,7 @@ export default function MechanicDashboardPage() {
                   </p>
                 </div>
                 <svg
-                  className="w-6 h-6 text-gray-400"
+                  className="w-6 h-6 text-gray-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -406,7 +406,7 @@ export default function MechanicDashboardPage() {
           ) : (
             <div className="text-center py-12">
               <svg
-                className="w-16 h-16 text-gray-300 mx-auto mb-4"
+                className="w-16 h-16 text-gray-600 mx-auto mb-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

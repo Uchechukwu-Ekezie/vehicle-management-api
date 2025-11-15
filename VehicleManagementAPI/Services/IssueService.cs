@@ -10,6 +10,7 @@ public interface IIssueService
     Task<List<IssueDTO>> GetAllIssuesAsync();
     Task<IssueDTO?> GetIssueByIdAsync(Guid id);
     Task<List<IssueDTO>> GetIssuesByVehicleAsync(Guid vehicleId);
+    Task<List<IssueDTO>> GetIssuesByReportedByAsync(Guid reportedById);
     Task<List<IssueDTO>> GetIssuesByStatusAsync(string status);
     Task<IssueDTO> CreateIssueAsync(Guid reportedById, CreateIssueRequest request);
     Task<IssueDTO?> UpdateIssueAsync(Guid id, UpdateIssueRequest request);
@@ -50,6 +51,17 @@ public class IssueService : IIssueService
             .Include(i => i.Vehicle)
             .Include(i => i.ReportedBy)
             .Where(i => i.VehicleID == vehicleId)
+            .Select(i => MapToDTO(i))
+            .ToListAsync();
+    }
+
+    public async Task<List<IssueDTO>> GetIssuesByReportedByAsync(Guid reportedById)
+    {
+        return await _context.Issues
+            .Include(i => i.Vehicle)
+            .Include(i => i.ReportedBy)
+            .Where(i => i.ReportedByID == reportedById)
+            .OrderByDescending(i => i.ReportDate)
             .Select(i => MapToDTO(i))
             .ToListAsync();
     }

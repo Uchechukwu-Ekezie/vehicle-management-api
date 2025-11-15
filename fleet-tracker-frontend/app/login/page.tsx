@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Link from "next/link";
 import { authApi } from "@/lib/api";
 import { setTokenCookie, getUserFromToken } from "@/lib/auth";
 
@@ -204,9 +205,22 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
+          
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-700">
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/signup"
+                className="font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+              >
+                Sign Up
+              </Link>
+            </p>
+          </div>
+
           <div className="mt-6 pt-6 border-t border-gray-200">
             <div className="text-center">
-              <p className="text-xs text-gray-500 font-medium mb-2">
+              <p className="text-xs text-gray-700 font-medium mb-2">
                 Demo Credentials Available
               </p>
               <div className="flex flex-wrap gap-2 justify-center">

@@ -149,19 +149,89 @@ export const usersApi = {
   },
 };
 
+// Helper function to normalize trip data from API
+const normalizeTrip = (trip: any) => {
+  if (!trip) return trip;
+
+  const normalizeId = (id: any) => {
+    if (id === null || id === undefined) return undefined;
+    return typeof id === 'string' ? id : id.toString();
+  };
+
+  return {
+    ...trip,
+    id: normalizeId(trip.id) ?? normalizeId(trip.tripID) ?? normalizeId(trip.TripID) ?? "",
+    tripID: normalizeId(trip.tripID) ?? normalizeId(trip.TripID),
+    vehicleId: normalizeId(trip.vehicleId) ?? normalizeId(trip.vehicleID) ?? normalizeId(trip.VehicleID) ?? "",
+    vehicleID: normalizeId(trip.vehicleID) ?? normalizeId(trip.VehicleID),
+    vehicleInfo: trip.vehicleInfo,
+    driverId: normalizeId(trip.driverId) ?? normalizeId(trip.driverID) ?? normalizeId(trip.DriverID) ?? "",
+    driverID: normalizeId(trip.driverID) ?? normalizeId(trip.DriverID),
+    driverName: trip.driverName,
+    startDate: trip.startDate ?? trip.startTime,
+    startTime: trip.startTime ?? trip.startDate,
+    endDate: trip.endDate ?? trip.endTime,
+    endTime: trip.endTime ?? trip.endDate,
+    startMileage: trip.startMileage ?? trip.StartMileage ?? 0,
+    endMileage: trip.endMileage ?? trip.EndMileage,
+    fuelUsed: trip.fuelUsed ?? trip.FuelUsed,
+    fuelEfficiency: trip.fuelEfficiency ?? trip.FuelEfficiency,
+    purpose: trip.purpose ?? trip.notes ?? trip.Notes ?? "",
+    notes: trip.notes ?? trip.Notes ?? trip.purpose,
+  };
+};
+
 // Trips API
 export const tripsApi = {
   getAll: async (token: string) => {
+    // Only Admin and Finance can access this endpoint
     const response = await api.get("/api/Trips", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data;
+    const trips = Array.isArray(response.data) ? response.data : [];
+    return trips.map(normalizeTrip);
   },
-  create: async (data: any, token: string) => {
-    const response = await api.post("/api/Trips", data, {
+  getByDriver: async (driverId: string, token: string) => {
+    const response = await api.get(`/api/Trips/driver/${driverId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data;
+    const trips = Array.isArray(response.data) ? response.data : [];
+    return trips.map(normalizeTrip);
+  },
+  getByVehicle: async (vehicleId: string, token: string) => {
+    const response = await api.get(`/api/Trips/vehicle/${vehicleId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const trips = Array.isArray(response.data) ? response.data : [];
+    return trips.map(normalizeTrip);
+  },
+  create: async (data: any, token: string) => {
+    // Backend expects POST to /api/Trips/start
+    // Backend extracts driverId from JWT token automatically
+    const backendData = {
+      vehicleID: data.vehicleID ?? data.vehicleId,
+      startTime: data.startTime ?? data.startDate ?? new Date().toISOString(),
+      startMileage: data.startMileage ?? 0,
+      notes: data.notes ?? data.purpose,
+    };
+    
+    const response = await api.post("/api/Trips/start", backendData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return normalizeTrip(response.data);
+  },
+  update: async (id: string, data: any, token: string) => {
+    // Backend expects POST to /api/Trips/{id}/end
+    const backendData: any = {};
+    if (data.endTime) backendData.endTime = data.endTime;
+    if (data.endDate) backendData.endTime = data.endDate;
+    if (data.endMileage !== undefined) backendData.endMileage = data.endMileage;
+    if (data.fuelUsed !== undefined) backendData.fuelUsed = data.fuelUsed;
+
+    const response = await api.post(`/api/Trips/${id}/end`, backendData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return normalizeTrip(response.data);
   },
 };
 
@@ -174,32 +244,198 @@ export const maintenanceApi = {
     return response.data;
   },
   create: async (data: any, token: string) => {
-    const response = await api.post("/api/Maintenance", data, {
+    // Backend expects POST to /api/Maintenance/schedule
+    const response = await api.post("/api/Maintenance/schedule", data, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
-  update: async (id: number, data: any, token: string) => {
-    const response = await api.put(`/api/Maintenance/${id}`, data, {
+  update: async (id: string, data: any, token: string) => {
+    // Backend expects PUT to /api/Maintenance/records/{id} (UUID)
+    const response = await api.put(`/api/Maintenance/records/${id}`, data, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 };
 
+// Helper function to normalize issue data from API
+const normalizeIssue = (issue: any) => {
+  if (!issue) return issue;
+
+  const normalizeId = (id: any) => {
+    if (id === null || id === undefined) return undefined;
+    return typeof id === 'string' ? id : id.toString();
+  };
+
+  return {
+    ...issue,
+    id: normalizeId(issue.id) ?? normalizeId(issue.issueID) ?? normalizeId(issue.IssueID) ?? "",
+    issueID: normalizeId(issue.issueID) ?? normalizeId(issue.IssueID),
+    vehicleId: normalizeId(issue.vehicleId) ?? normalizeId(issue.vehicleID) ?? normalizeId(issue.VehicleID) ?? "",
+    vehicleID: normalizeId(issue.vehicleID) ?? normalizeId(issue.VehicleID),
+    vehicleInfo: issue.vehicleInfo,
+    reportedById: normalizeId(issue.reportedById) ?? normalizeId(issue.reportedByID) ?? normalizeId(issue.ReportedByID) ?? "",
+    reportedByID: normalizeId(issue.reportedByID) ?? normalizeId(issue.ReportedByID),
+    reportedBy: issue.reportedBy ?? issue.reportedByName ?? issue.ReportedByName ?? "",
+    reportedByName: issue.reportedByName ?? issue.ReportedByName,
+    reportedDate: issue.reportedDate ?? issue.reportDate ?? issue.ReportDate,
+    reportDate: issue.reportDate ?? issue.ReportDate ?? issue.reportedDate,
+    description: issue.description ?? issue.Description ?? "",
+    status: issue.status ?? issue.Status ?? "Open",
+    severity: issue.severity ?? issue.priority ?? issue.Priority ?? "Medium", // Map priority to severity
+    priority: issue.priority ?? issue.Priority ?? issue.severity ?? "Medium",
+    resolvedDate: issue.resolvedDate ?? issue.resolvedDate ?? issue.ResolvedDate,
+    resolution: issue.resolution ?? issue.Resolution,
+  };
+};
+
 // Issues API
 export const issuesApi = {
   getAll: async (token: string) => {
+    // Only Admin and Mechanic can access this endpoint
     const response = await api.get("/api/Issues", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const issues = Array.isArray(response.data) ? response.data : [];
+    return issues.map(normalizeIssue);
+  },
+  getByVehicle: async (vehicleId: string, token: string) => {
+    const response = await api.get(`/api/Issues/vehicle/${vehicleId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const issues = Array.isArray(response.data) ? response.data : [];
+    return issues.map(normalizeIssue);
+  },
+  getByReportedBy: async (reportedById: string, token: string) => {
+    // Get issues reported by a specific user (for drivers to see their own issues)
+    const response = await api.get(`/api/Issues/reported/${reportedById}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const issues = Array.isArray(response.data) ? response.data : [];
+    return issues.map(normalizeIssue);
+  },
+  create: async (data: any, token: string) => {
+    // Backend expects CreateIssueRequest: vehicleID, description, priority (optional)
+    const backendData = {
+      vehicleID: data.vehicleId ?? data.vehicleID,
+      description: data.description,
+      priority: data.priority ?? data.severity ?? "Medium", // Map severity to priority
+    };
+    
+    const response = await api.post("/api/Issues", backendData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return normalizeIssue(response.data);
+  },
+};
+
+// Helper function to normalize inspection data from API
+const normalizeInspection = (inspection: any) => {
+  if (!inspection) return inspection;
+
+  const normalizeId = (id: any) => {
+    if (id === null || id === undefined) return undefined;
+    return typeof id === 'string' ? id : id.toString();
+  };
+
+  return {
+    ...inspection,
+    id: normalizeId(inspection.id) ?? normalizeId(inspection.inspectionID) ?? "",
+    inspectionID: normalizeId(inspection.inspectionID),
+    vehicleId: normalizeId(inspection.vehicleId) ?? normalizeId(inspection.vehicleID) ?? "",
+    vehicleID: normalizeId(inspection.vehicleID),
+    vehicleInfo: inspection.vehicleInfo,
+    inspectionType: inspection.inspectionType,
+    dueDate: inspection.dueDate,
+    completionDate: inspection.completionDate,
+    isCompliant: inspection.isCompliant ?? false,
+    documentLink: inspection.documentLink,
+    notes: inspection.notes,
+    createdAt: inspection.createdAt,
+    updatedAt: inspection.updatedAt,
+  };
+};
+
+// Inspections API
+export const inspectionsApi = {
+  getAll: async (token: string) => {
+    const response = await api.get("/api/Inspections", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const inspections = Array.isArray(response.data) ? response.data : [];
+    return inspections.map(normalizeInspection);
+  },
+  getById: async (id: string, token: string) => {
+    const response = await api.get(`/api/Inspections/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return normalizeInspection(response.data);
+  },
+  getByVehicle: async (vehicleId: string, token: string) => {
+    const response = await api.get(`/api/Inspections/vehicle/${vehicleId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const inspections = Array.isArray(response.data) ? response.data : [];
+    return inspections.map(normalizeInspection);
+  },
+  getByType: async (inspectionType: string, token: string) => {
+    const response = await api.get(`/api/Inspections/type/${inspectionType}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const inspections = Array.isArray(response.data) ? response.data : [];
+    return inspections.map(normalizeInspection);
+  },
+  getUpcoming: async (daysAhead: number = 30, token: string) => {
+    const response = await api.get(`/api/Inspections/upcoming?daysAhead=${daysAhead}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const inspections = Array.isArray(response.data) ? response.data : [];
+    return inspections.map(normalizeInspection);
+  },
+  getAlerts: async (token: string) => {
+    const response = await api.get("/api/Inspections/alerts", {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
   create: async (data: any, token: string) => {
-    const response = await api.post("/api/Issues", data, {
+    // Map frontend fields to backend DTO fields
+    const backendData = {
+      vehicleID: data.vehicleId ?? data.vehicleID,
+      inspectionType: data.inspectionType,
+      dueDate: data.dueDate,
+      documentLink: data.documentLink,
+      notes: data.notes,
+    };
+    // Remove frontend-specific fields
+    delete backendData.vehicleId;
+    delete backendData.id;
+    delete backendData.inspectionID;
+
+    const response = await api.post("/api/Inspections", backendData, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data;
+    return normalizeInspection(response.data);
+  },
+  update: async (id: string, data: any, token: string) => {
+    // Map frontend fields to backend DTO fields
+    const backendData: any = {};
+    if (data.dueDate) backendData.dueDate = data.dueDate;
+    if (data.completionDate) backendData.completionDate = data.completionDate;
+    if (data.isCompliant !== undefined) backendData.isCompliant = data.isCompliant;
+    if (data.documentLink !== undefined) backendData.documentLink = data.documentLink;
+    if (data.notes !== undefined) backendData.notes = data.notes;
+
+    const response = await api.put(`/api/Inspections/${id}`, backendData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return normalizeInspection(response.data);
+  },
+  delete: async (id: string, token: string) => {
+    await api.delete(`/api/Inspections/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
   },
 };
 

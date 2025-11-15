@@ -380,7 +380,7 @@ export default function MechanicInventoryPage() {
                     <h3 className="font-bold text-lg text-gray-900">
                       {part.partName}
                     </h3>
-                    <p className="text-sm text-gray-500">#{part.partNumber}</p>
+                    <p className="text-base text-gray-700">#{part.partNumber}</p>
                   </div>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStockStatusColor(
@@ -467,7 +467,7 @@ export default function MechanicInventoryPage() {
         <Card>
           <CardContent className="p-12 text-center">
             <svg
-              className="w-20 h-20 text-gray-300 mx-auto mb-4"
+              className="w-20 h-20 text-gray-600 mx-auto mb-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -480,7 +480,7 @@ export default function MechanicInventoryPage() {
               />
             </svg>
             <p className="text-gray-600 text-lg">No parts in inventory</p>
-            <p className="text-gray-500 text-sm mt-2">
+            <p className="text-gray-700 text-base mt-2">
               Click &quot;Add New Part&quot; to get started
             </p>
           </CardContent>

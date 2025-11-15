@@ -85,6 +85,32 @@ export interface PartsInventory {
   supplierId?: string; // UUID as string
 }
 
+export interface Inspection {
+  id: string; // UUID as string
+  inspectionID?: string; // API may return this (UUID)
+  vehicleId: string; // UUID as string
+  vehicleID?: string; // API may return this (UUID)
+  vehicleInfo?: string; // API may return this (Make Model - LicensePlate)
+  inspectionType: "MOT" | "Insurance" | "Tax" | "Safety";
+  dueDate: string;
+  completionDate?: string;
+  isCompliant: boolean;
+  documentLink?: string;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface InspectionAlert {
+  inspectionID: string; // UUID as string
+  vehicleID: string; // UUID as string
+  vehicleInfo: string;
+  inspectionType: string;
+  dueDate: string;
+  daysUntilDue: number;
+  isOverdue: boolean;
+}
+
 export interface User {
   id: string; // UUID as string
   username: string;

@@ -1,17 +1,24 @@
 -- ============================================
 -- RAILWAY DATABASE RESET SCRIPT
 -- ============================================
--- This script will drop all tables and let Entity Framework 
+-- This script will drop all tables and let Entity Framework
 -- recreate them with the proper UUID schema
 
 -- 1. Drop all tables in correct order (child tables first)
 DROP TABLE IF EXISTS `Trips`;
+
 DROP TABLE IF EXISTS `Issues`;
+
 DROP TABLE IF EXISTS `MaintenanceRecords`;
+
 DROP TABLE IF EXISTS `Inspections`;
+
 DROP TABLE IF EXISTS `PartsInventory`;
+
 DROP TABLE IF EXISTS `Vehicles`;
+
 DROP TABLE IF EXISTS `Users`;
+
 DROP TABLE IF EXISTS `__EFMigrationsHistory`;
 
 -- 2. Verify all tables are gone

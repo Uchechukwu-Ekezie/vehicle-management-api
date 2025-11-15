@@ -291,7 +291,7 @@ export default function SignupPage() {
                         className={`text-2xl mb-2 ${
                           formData.role === role.value
                             ? `text-${role.color}-600`
-                            : "text-gray-400"
+                            : "text-gray-600"
                         }`}
                       >
                         {role.value === "Admin" && "👨‍💼"}
@@ -308,7 +308,7 @@ export default function SignupPage() {
                       >
                         {role.label}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-sm text-gray-700 mt-1">
                         {role.description}
                       </div>
                     </button>

@@ -98,7 +98,7 @@ export default async function AdminDashboard() {
           </div>
           <div>
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <p className="text-blue-100 mt-1">
+            <p className="text-white/90 mt-1 text-base">
               Welcome back! Here&apos;s your fleet overview
             </p>
           </div>
@@ -120,7 +120,7 @@ export default async function AdminDashboard() {
             <div className="text-3xl font-bold text-gray-900">
               {vehicleStats.total}
             </div>
-            <p className="text-xs text-gray-500 mt-2">Fleet size</p>
+            <p className="text-sm text-gray-700 mt-2">Fleet size</p>
           </CardContent>
         </Card>
 
@@ -137,7 +137,7 @@ export default async function AdminDashboard() {
             <div className="text-3xl font-bold text-green-600">
               {vehicleStats.available}
             </div>
-            <p className="text-xs text-gray-500 mt-2">Ready for use</p>
+            <p className="text-sm text-gray-700 mt-2">Ready for use</p>
           </CardContent>
         </Card>
 
@@ -154,7 +154,7 @@ export default async function AdminDashboard() {
             <div className="text-3xl font-bold text-blue-600">
               {vehicleStats.inUse}
             </div>
-            <p className="text-xs text-gray-500 mt-2">Currently deployed</p>
+            <p className="text-sm text-gray-700 mt-2">Currently deployed</p>
           </CardContent>
         </Card>
 
@@ -171,7 +171,7 @@ export default async function AdminDashboard() {
             <div className="text-3xl font-bold text-orange-600">
               {vehicleStats.maintenance}
             </div>
-            <p className="text-xs text-gray-500 mt-2">Being serviced</p>
+            <p className="text-sm text-gray-700 mt-2">Being serviced</p>
           </CardContent>
         </Card>
       </div>
@@ -207,7 +207,7 @@ export default async function AdminDashboard() {
               <div className="text-4xl font-bold text-blue-600">
                 {maintenanceStats.scheduled}
               </div>
-              <p className="text-sm text-gray-500 mt-2">Upcoming tasks</p>
+              <p className="text-base text-gray-700 mt-2">Upcoming tasks</p>
             </CardContent>
           </Card>
 
@@ -235,7 +235,7 @@ export default async function AdminDashboard() {
               <div className="text-4xl font-bold text-yellow-600">
                 {maintenanceStats.inProgress}
               </div>
-              <p className="text-sm text-gray-500 mt-2">Currently working</p>
+              <p className="text-base text-gray-700 mt-2">Currently working</p>
             </CardContent>
           </Card>
 
@@ -251,7 +251,7 @@ export default async function AdminDashboard() {
               <div className="text-4xl font-bold text-green-600">
                 {maintenanceStats.completed}
               </div>
-              <p className="text-sm text-gray-500 mt-2">This month</p>
+              <p className="text-base text-gray-700 mt-2">This month</p>
             </CardContent>
           </Card>
         </div>

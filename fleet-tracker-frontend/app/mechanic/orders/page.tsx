@@ -34,7 +34,7 @@ export default function MechanicOrdersPage() {
   };
 
   const handleStatusUpdate = async (
-    orderId: number,
+    orderId: string, // UUID as string
     newStatus: MaintenanceRecord["status"]
   ) => {
     try {
@@ -46,12 +46,12 @@ export default function MechanicOrdersPage() {
       const order = workOrders.find((o) => o.id === orderId);
       if (!order) return;
 
+      // Map to backend DTO fields for update
       await maintenanceApi.update(
         orderId,
         {
-          ...order,
           status: newStatus,
-          completedDate:
+          completionDate:
             newStatus === "Completed"
               ? new Date().toISOString()
               : order.completedDate,
@@ -272,7 +272,7 @@ export default function MechanicOrdersPage() {
         <Card>
           <CardContent className="p-12 text-center">
             <svg
-              className="w-20 h-20 text-gray-300 mx-auto mb-4"
+              className="w-20 h-20 text-gray-600 mx-auto mb-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -285,7 +285,7 @@ export default function MechanicOrdersPage() {
               />
             </svg>
             <p className="text-gray-600 text-lg">No work orders found</p>
-            <p className="text-gray-500 text-sm mt-2">
+            <p className="text-gray-700 text-base mt-2">
               Try adjusting your filters
             </p>
           </CardContent>

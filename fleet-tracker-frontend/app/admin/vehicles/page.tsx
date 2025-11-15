@@ -345,7 +345,7 @@ export default function VehiclesPage() {
         <Card>
           <CardContent className="p-12 text-center">
             <svg
-              className="w-16 h-16 text-gray-400 mx-auto mb-4"
+              className="w-16 h-16 text-gray-600 mx-auto mb-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -358,7 +358,7 @@ export default function VehiclesPage() {
               />
             </svg>
             <p className="text-gray-600 text-lg">No vehicles found</p>
-            <p className="text-gray-500 text-sm mt-2">
+            <p className="text-gray-700 text-base mt-2">
               Try adjusting your search or filters
             </p>
           </CardContent>
@@ -390,7 +390,7 @@ export default function VehiclesPage() {
                 <div className="space-y-3 mb-4">
                   <div className="flex items-center text-sm">
                     <svg
-                      className="w-4 h-4 text-gray-400 mr-2"
+                      className="w-4 h-4 text-gray-600 mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -410,7 +410,7 @@ export default function VehiclesPage() {
 
                   <div className="flex items-center text-sm">
                     <svg
-                      className="w-4 h-4 text-gray-400 mr-2"
+                      className="w-4 h-4 text-gray-600 mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -430,7 +430,7 @@ export default function VehiclesPage() {
 
                   <div className="flex items-center text-sm">
                     <svg
-                      className="w-4 h-4 text-gray-400 mr-2"
+                      className="w-4 h-4 text-gray-600 mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
