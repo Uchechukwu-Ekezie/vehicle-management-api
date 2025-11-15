@@ -11,8 +11,8 @@ using VehicleManagementAPI.Data;
 namespace VehicleManagementAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251114013304_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251115215905_InitialCreateWithUUID")]
+    partial class InitialCreateWithUUID
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,9 +24,8 @@ namespace VehicleManagementAPI.Migrations
 
             modelBuilder.Entity("VehicleManagementAPI.Models.Inspection", b =>
                 {
-                    b.Property<int>("InspectionID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<Guid>("InspectionID")
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime?>("CompletionDate")
                         .HasColumnType("datetime(6)");
@@ -56,8 +55,8 @@ namespace VehicleManagementAPI.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("VehicleID")
-                        .HasColumnType("int");
+                    b.Property<Guid>("VehicleID")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("InspectionID");
 
@@ -68,9 +67,8 @@ namespace VehicleManagementAPI.Migrations
 
             modelBuilder.Entity("VehicleManagementAPI.Models.Issue", b =>
                 {
-                    b.Property<int>("IssueID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<Guid>("IssueID")
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -87,8 +85,8 @@ namespace VehicleManagementAPI.Migrations
                     b.Property<DateTime>("ReportDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("ReportedByID")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ReportedByID")
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Resolution")
                         .HasMaxLength(1000)
@@ -105,8 +103,8 @@ namespace VehicleManagementAPI.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("VehicleID")
-                        .HasColumnType("int");
+                    b.Property<Guid>("VehicleID")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("IssueID");
 
@@ -119,9 +117,8 @@ namespace VehicleManagementAPI.Migrations
 
             modelBuilder.Entity("VehicleManagementAPI.Models.MaintenanceRecord", b =>
                 {
-                    b.Property<int>("RecordID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<Guid>("RecordID")
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime?>("CompletionDate")
                         .HasColumnType("datetime(6)");
@@ -144,8 +141,8 @@ namespace VehicleManagementAPI.Migrations
                     b.Property<decimal?>("MileageAtService")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<int?>("PartsUsedID")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("PartsUsedID")
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime>("ScheduledDate")
                         .HasColumnType("datetime(6)");
@@ -158,8 +155,8 @@ namespace VehicleManagementAPI.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("VehicleID")
-                        .HasColumnType("int");
+                    b.Property<Guid>("VehicleID")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("RecordID");
 
@@ -172,9 +169,8 @@ namespace VehicleManagementAPI.Migrations
 
             modelBuilder.Entity("VehicleManagementAPI.Models.PartsInventory", b =>
                 {
-                    b.Property<int>("PartID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<Guid>("PartID")
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -219,15 +215,14 @@ namespace VehicleManagementAPI.Migrations
 
             modelBuilder.Entity("VehicleManagementAPI.Models.Trip", b =>
                 {
-                    b.Property<int>("TripID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<Guid>("TripID")
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("DriverID")
-                        .HasColumnType("int");
+                    b.Property<Guid>("DriverID")
+                        .HasColumnType("char(36)");
 
                     b.Property<decimal?>("EndMileage")
                         .HasColumnType("decimal(65,30)");
@@ -251,8 +246,8 @@ namespace VehicleManagementAPI.Migrations
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("VehicleID")
-                        .HasColumnType("int");
+                    b.Property<Guid>("VehicleID")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("TripID");
 
@@ -265,9 +260,8 @@ namespace VehicleManagementAPI.Migrations
 
             modelBuilder.Entity("VehicleManagementAPI.Models.User", b =>
                 {
-                    b.Property<int>("UserID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -308,12 +302,11 @@ namespace VehicleManagementAPI.Migrations
 
             modelBuilder.Entity("VehicleManagementAPI.Models.Vehicle", b =>
                 {
-                    b.Property<int>("VehicleID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<Guid>("VehicleID")
+                        .HasColumnType("char(36)");
 
-                    b.Property<int?>("AssignedDriverID")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("AssignedDriverID")
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Color")
                         .HasMaxLength(50)

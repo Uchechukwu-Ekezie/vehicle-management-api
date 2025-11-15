@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -7,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace VehicleManagementAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCreateWithUUID : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,8 +18,7 @@ namespace VehicleManagementAPI.Migrations
                 name: "PartsInventory",
                 columns: table => new
                 {
-                    PartID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    PartID = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Name = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     SKU = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
@@ -45,8 +43,7 @@ namespace VehicleManagementAPI.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    UserID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    UserID = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Username = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     PasswordHash = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
@@ -69,8 +66,7 @@ namespace VehicleManagementAPI.Migrations
                 name: "Vehicles",
                 columns: table => new
                 {
-                    VehicleID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    VehicleID = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Make = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Model = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
@@ -83,7 +79,7 @@ namespace VehicleManagementAPI.Migrations
                     Status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CurrentMileage = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    AssignedDriverID = table.Column<int>(type: "int", nullable: true),
+                    AssignedDriverID = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     Color = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     PurchaseDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
@@ -106,9 +102,8 @@ namespace VehicleManagementAPI.Migrations
                 name: "Inspections",
                 columns: table => new
                 {
-                    InspectionID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    VehicleID = table.Column<int>(type: "int", nullable: false),
+                    InspectionID = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    VehicleID = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     InspectionType = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     DueDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -137,10 +132,9 @@ namespace VehicleManagementAPI.Migrations
                 name: "Issues",
                 columns: table => new
                 {
-                    IssueID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    VehicleID = table.Column<int>(type: "int", nullable: false),
-                    ReportedByID = table.Column<int>(type: "int", nullable: false),
+                    IssueID = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    VehicleID = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    ReportedByID = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     ReportDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Description = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -176,9 +170,8 @@ namespace VehicleManagementAPI.Migrations
                 name: "MaintenanceRecords",
                 columns: table => new
                 {
-                    RecordID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    VehicleID = table.Column<int>(type: "int", nullable: false),
+                    RecordID = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    VehicleID = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     MaintenanceType = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ScheduledDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -186,7 +179,7 @@ namespace VehicleManagementAPI.Migrations
                     Cost = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     MechanicNotes = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    PartsUsedID = table.Column<int>(type: "int", nullable: true),
+                    PartsUsedID = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     Status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     MileageAtService = table.Column<decimal>(type: "decimal(65,30)", nullable: true),
@@ -215,10 +208,9 @@ namespace VehicleManagementAPI.Migrations
                 name: "Trips",
                 columns: table => new
                 {
-                    TripID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    VehicleID = table.Column<int>(type: "int", nullable: false),
-                    DriverID = table.Column<int>(type: "int", nullable: false),
+                    TripID = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    VehicleID = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    DriverID = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     StartTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     EndTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     StartMileage = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
