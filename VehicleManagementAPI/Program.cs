@@ -104,7 +104,11 @@ builder.Services.AddCors(options =>
     {
         // Get allowed origins from environment or use defaults
         var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
-            ?? new[] { "http://localhost:3000", "http://localhost:5173" };
+            ?? new[] { 
+                "http://localhost:3000", 
+                "http://localhost:3001", 
+                "http://localhost:5173" 
+            };
 
         policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
