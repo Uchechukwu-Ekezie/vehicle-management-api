@@ -22,3 +22,12 @@ public class RegisterRequest
     public string FullName { get; set; } = string.Empty;
     public string Role { get; set; } = "Driver"; // Default role
 }
+
+public class UserDTO
+{
+    public Guid UserID { get; set; }
+    public string Username { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string? FullName { get; set; }
+    public string Role { get; set; } = string.Empty;
+}
