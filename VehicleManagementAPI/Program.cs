@@ -69,6 +69,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<ITripService, TripService>();
 builder.Services.AddScoped<IMaintenanceService, MaintenanceService>();
+builder.Services.AddScoped<IInspectionService, InspectionService>();
 builder.Services.AddScoped<IIssueService, IssueService>();
 builder.Services.AddScoped<IPartsService, PartsService>();
 builder.Services.AddScoped<IReportingService, ReportingService>();
@@ -107,10 +108,10 @@ builder.Services.AddCors(options =>
     {
         // Get allowed origins from environment or use defaults
         var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
-            ?? new[] { 
-                "http://localhost:3000", 
-                "http://localhost:3001", 
-                "http://localhost:5173" 
+            ?? new[] {
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "http://localhost:5173"
             };
 
         policy.WithOrigins(allowedOrigins)
