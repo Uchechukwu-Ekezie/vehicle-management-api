@@ -2,10 +2,10 @@ namespace VehicleManagementAPI.DTOs;
 
 public class TripDTO
 {
-    public int TripID { get; set; }
-    public int VehicleID { get; set; }
+    public Guid TripID { get; set; }
+    public Guid VehicleID { get; set; }
     public string VehicleInfo { get; set; } = string.Empty;
-    public int DriverID { get; set; }
+    public Guid DriverID { get; set; }
     public string DriverName { get; set; } = string.Empty;
     public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; }
@@ -18,7 +18,7 @@ public class TripDTO
 
 public class CreateTripRequest
 {
-    public int VehicleID { get; set; }
+    public Guid VehicleID { get; set; }
     public DateTime StartTime { get; set; } = DateTime.UtcNow;
     public decimal StartMileage { get; set; }
     public string? Notes { get; set; }

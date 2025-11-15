@@ -48,7 +48,7 @@ public class AuthController : ControllerBase
     public async Task<ActionResult> GetCurrentUser()
     {
         var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim, out Guid userId))
             return Unauthorized();
 
         var user = await _authService.GetUserByIdAsync(userId);

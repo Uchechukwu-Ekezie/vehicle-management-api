@@ -6,8 +6,8 @@ namespace VehicleManagementAPI.Models;
 public class Vehicle
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int VehicleID { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    public Guid VehicleID { get; set; } = Guid.NewGuid();
 
     [Required]
     [StringLength(100)]
@@ -35,7 +35,7 @@ public class Vehicle
     [Required]
     public decimal CurrentMileage { get; set; }
 
-    public int? AssignedDriverID { get; set; }
+    public Guid? AssignedDriverID { get; set; }
 
     [StringLength(50)]
     public string? Color { get; set; }

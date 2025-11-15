@@ -6,11 +6,11 @@ namespace VehicleManagementAPI.Models;
 public class Inspection
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int InspectionID { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    public Guid InspectionID { get; set; } = Guid.NewGuid();
 
     [Required]
-    public int VehicleID { get; set; }
+    public Guid VehicleID { get; set; }
 
     [Required]
     [StringLength(100)]

@@ -8,12 +8,12 @@ namespace VehicleManagementAPI.Services;
 public interface IVehicleService
 {
     Task<List<VehicleDTO>> GetAllVehiclesAsync();
-    Task<VehicleDTO?> GetVehicleByIdAsync(int id);
+    Task<VehicleDTO?> GetVehicleByIdAsync(Guid id);
     Task<List<VehicleDTO>> GetVehiclesByStatusAsync(string status);
     Task<VehicleDTO> CreateVehicleAsync(CreateVehicleRequest request);
-    Task<VehicleDTO?> UpdateVehicleAsync(int id, UpdateVehicleRequest request);
-    Task<bool> DeleteVehicleAsync(int id);
-    Task<bool> AssignDriverAsync(int vehicleId, int driverId);
+    Task<VehicleDTO?> UpdateVehicleAsync(Guid id, UpdateVehicleRequest request);
+    Task<bool> DeleteVehicleAsync(Guid id);
+    Task<bool> AssignDriverAsync(Guid vehicleId, Guid driverId);
 }
 
 public class VehicleService : IVehicleService
@@ -33,7 +33,7 @@ public class VehicleService : IVehicleService
             .ToListAsync();
     }
 
-    public async Task<VehicleDTO?> GetVehicleByIdAsync(int id)
+    public async Task<VehicleDTO?> GetVehicleByIdAsync(Guid id)
     {
         var vehicle = await _context.Vehicles
             .Include(v => v.AssignedDriver)
@@ -55,6 +55,7 @@ public class VehicleService : IVehicleService
     {
         var vehicle = new Vehicle
         {
+            VehicleID = Guid.NewGuid(), // Generate UUID
             Make = request.Make,
             Model = request.Model,
             Year = request.Year,
@@ -74,7 +75,7 @@ public class VehicleService : IVehicleService
         return MapToDTO(vehicle);
     }
 
-    public async Task<VehicleDTO?> UpdateVehicleAsync(int id, UpdateVehicleRequest request)
+    public async Task<VehicleDTO?> UpdateVehicleAsync(Guid id, UpdateVehicleRequest request)
     {
         var vehicle = await _context.Vehicles
             .Include(v => v.AssignedDriver)
@@ -98,7 +99,7 @@ public class VehicleService : IVehicleService
         return MapToDTO(vehicle);
     }
 
-    public async Task<bool> DeleteVehicleAsync(int id)
+    public async Task<bool> DeleteVehicleAsync(Guid id)
     {
         var vehicle = await _context.Vehicles.FindAsync(id);
         if (vehicle == null) return false;
@@ -109,7 +110,7 @@ public class VehicleService : IVehicleService
         return true;
     }
 
-    public async Task<bool> AssignDriverAsync(int vehicleId, int driverId)
+    public async Task<bool> AssignDriverAsync(Guid vehicleId, Guid driverId)
     {
         var vehicle = await _context.Vehicles.FindAsync(vehicleId);
         var driver = await _context.Users.FindAsync(driverId);

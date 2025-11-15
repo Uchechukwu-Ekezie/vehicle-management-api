@@ -14,7 +14,7 @@ public interface IAuthService
 {
     Task<LoginResponse?> LoginAsync(LoginRequest request);
     Task<LoginResponse> RegisterAsync(RegisterRequest request);
-    Task<User?> GetUserByIdAsync(int userId);
+    Task<User?> GetUserByIdAsync(Guid userId);
 }
 
 public class AuthService : IAuthService
@@ -60,6 +60,7 @@ public class AuthService : IAuthService
 
         var user = new User
         {
+            UserID = Guid.NewGuid(), // Generate UUID
             Username = request.Username,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
             Email = request.Email,
@@ -82,7 +83,7 @@ public class AuthService : IAuthService
         };
     }
 
-    public async Task<User?> GetUserByIdAsync(int userId)
+    public async Task<User?> GetUserByIdAsync(Guid userId)
     {
         return await _context.Users.FindAsync(userId);
     }

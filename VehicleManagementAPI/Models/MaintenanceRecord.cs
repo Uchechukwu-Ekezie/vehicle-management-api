@@ -6,11 +6,11 @@ namespace VehicleManagementAPI.Models;
 public class MaintenanceRecord
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int RecordID { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    public Guid RecordID { get; set; } = Guid.NewGuid();
 
     [Required]
-    public int VehicleID { get; set; }
+    public Guid VehicleID { get; set; }
 
     [Required]
     [StringLength(100)]
@@ -27,7 +27,7 @@ public class MaintenanceRecord
     [StringLength(1000)]
     public string? MechanicNotes { get; set; }
 
-    public int? PartsUsedID { get; set; }
+    public Guid? PartsUsedID { get; set; }
 
     [StringLength(50)]
     public string Status { get; set; } = "Scheduled"; // Scheduled, In Progress, Completed, Cancelled

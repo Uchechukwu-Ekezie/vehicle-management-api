@@ -9,7 +9,7 @@ public interface IReportingService
 {
     Task<CostAnalyticsDTO> GetMaintenanceCostAnalyticsAsync(DateTime? startDate, DateTime? endDate);
     Task<List<FuelEfficiencyReport>> GetFuelEfficiencyReportAsync();
-    Task<FuelEfficiencyReport?> GetFuelEfficiencyByVehicleAsync(int vehicleId);
+    Task<FuelEfficiencyReport?> GetFuelEfficiencyByVehicleAsync(Guid vehicleId);
 }
 
 public class ReportingService : IReportingService
@@ -115,7 +115,7 @@ public class ReportingService : IReportingService
         return report;
     }
 
-    public async Task<FuelEfficiencyReport?> GetFuelEfficiencyByVehicleAsync(int vehicleId)
+    public async Task<FuelEfficiencyReport?> GetFuelEfficiencyByVehicleAsync(Guid vehicleId)
     {
         var trips = await _context.Trips
             .Include(t => t.Vehicle)

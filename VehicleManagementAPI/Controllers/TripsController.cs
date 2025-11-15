@@ -27,7 +27,7 @@ public class TripsController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<TripDTO>> GetTripById(int id)
+    public async Task<ActionResult<TripDTO>> GetTripById(Guid id)
     {
         var trip = await _tripService.GetTripByIdAsync(id);
         if (trip == null)
@@ -37,14 +37,14 @@ public class TripsController : ControllerBase
     }
 
     [HttpGet("driver/{driverId}")]
-    public async Task<ActionResult<List<TripDTO>>> GetTripsByDriver(int driverId)
+    public async Task<ActionResult<List<TripDTO>>> GetTripsByDriver(Guid driverId)
     {
         var trips = await _tripService.GetTripsByDriverAsync(driverId);
         return Ok(trips);
     }
 
     [HttpGet("vehicle/{vehicleId}")]
-    public async Task<ActionResult<List<TripDTO>>> GetTripsByVehicle(int vehicleId)
+    public async Task<ActionResult<List<TripDTO>>> GetTripsByVehicle(Guid vehicleId)
     {
         var trips = await _tripService.GetTripsByVehicleAsync(vehicleId);
         return Ok(trips);
@@ -57,7 +57,7 @@ public class TripsController : ControllerBase
         try
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out int driverId))
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim, out Guid driverId))
                 return Unauthorized();
 
             var trip = await _tripService.StartTripAsync(driverId, request);
@@ -71,7 +71,7 @@ public class TripsController : ControllerBase
 
     [HttpPost("{id}/end")]
     [Authorize(Roles = "Driver")]
-    public async Task<ActionResult<TripDTO>> EndTrip(int id, [FromBody] EndTripRequest request)
+    public async Task<ActionResult<TripDTO>> EndTrip(Guid id, [FromBody] EndTripRequest request)
     {
         try
         {

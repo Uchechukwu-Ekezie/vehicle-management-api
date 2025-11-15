@@ -25,7 +25,7 @@ public class VehiclesController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<VehicleDTO>> GetVehicleById(int id)
+    public async Task<ActionResult<VehicleDTO>> GetVehicleById(Guid id)
     {
         var vehicle = await _vehicleService.GetVehicleByIdAsync(id);
         if (vehicle == null)
@@ -58,7 +58,7 @@ public class VehiclesController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<VehicleDTO>> UpdateVehicle(int id, [FromBody] UpdateVehicleRequest request)
+    public async Task<ActionResult<VehicleDTO>> UpdateVehicle(Guid id, [FromBody] UpdateVehicleRequest request)
     {
         var vehicle = await _vehicleService.UpdateVehicleAsync(id, request);
         if (vehicle == null)
@@ -69,7 +69,7 @@ public class VehiclesController : ControllerBase
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> DeleteVehicle(int id)
+    public async Task<ActionResult> DeleteVehicle(Guid id)
     {
         var result = await _vehicleService.DeleteVehicleAsync(id);
         if (!result)
@@ -80,7 +80,7 @@ public class VehiclesController : ControllerBase
 
     [HttpPost("{vehicleId}/assign/{driverId}")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> AssignDriver(int vehicleId, int driverId)
+    public async Task<ActionResult> AssignDriver(Guid vehicleId, Guid driverId)
     {
         var result = await _vehicleService.AssignDriverAsync(vehicleId, driverId);
         if (!result)

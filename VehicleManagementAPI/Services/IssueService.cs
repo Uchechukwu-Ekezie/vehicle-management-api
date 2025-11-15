@@ -8,12 +8,12 @@ namespace VehicleManagementAPI.Services;
 public interface IIssueService
 {
     Task<List<IssueDTO>> GetAllIssuesAsync();
-    Task<IssueDTO?> GetIssueByIdAsync(int id);
-    Task<List<IssueDTO>> GetIssuesByVehicleAsync(int vehicleId);
+    Task<IssueDTO?> GetIssueByIdAsync(Guid id);
+    Task<List<IssueDTO>> GetIssuesByVehicleAsync(Guid vehicleId);
     Task<List<IssueDTO>> GetIssuesByStatusAsync(string status);
-    Task<IssueDTO> CreateIssueAsync(int reportedById, CreateIssueRequest request);
-    Task<IssueDTO?> UpdateIssueAsync(int id, UpdateIssueRequest request);
-    Task<bool> DeleteIssueAsync(int id);
+    Task<IssueDTO> CreateIssueAsync(Guid reportedById, CreateIssueRequest request);
+    Task<IssueDTO?> UpdateIssueAsync(Guid id, UpdateIssueRequest request);
+    Task<bool> DeleteIssueAsync(Guid id);
 }
 
 public class IssueService : IIssueService
@@ -34,7 +34,7 @@ public class IssueService : IIssueService
             .ToListAsync();
     }
 
-    public async Task<IssueDTO?> GetIssueByIdAsync(int id)
+    public async Task<IssueDTO?> GetIssueByIdAsync(Guid id)
     {
         var issue = await _context.Issues
             .Include(i => i.Vehicle)
@@ -44,7 +44,7 @@ public class IssueService : IIssueService
         return issue == null ? null : MapToDTO(issue);
     }
 
-    public async Task<List<IssueDTO>> GetIssuesByVehicleAsync(int vehicleId)
+    public async Task<List<IssueDTO>> GetIssuesByVehicleAsync(Guid vehicleId)
     {
         return await _context.Issues
             .Include(i => i.Vehicle)
@@ -64,7 +64,7 @@ public class IssueService : IIssueService
             .ToListAsync();
     }
 
-    public async Task<IssueDTO> CreateIssueAsync(int reportedById, CreateIssueRequest request)
+    public async Task<IssueDTO> CreateIssueAsync(Guid reportedById, CreateIssueRequest request)
     {
         var vehicle = await _context.Vehicles.FindAsync(request.VehicleID);
         if (vehicle == null)
@@ -93,7 +93,7 @@ public class IssueService : IIssueService
         return MapToDTO(createdIssue);
     }
 
-    public async Task<IssueDTO?> UpdateIssueAsync(int id, UpdateIssueRequest request)
+    public async Task<IssueDTO?> UpdateIssueAsync(Guid id, UpdateIssueRequest request)
     {
         var issue = await _context.Issues
             .Include(i => i.Vehicle)
@@ -114,7 +114,7 @@ public class IssueService : IIssueService
         return MapToDTO(issue);
     }
 
-    public async Task<bool> DeleteIssueAsync(int id)
+    public async Task<bool> DeleteIssueAsync(Guid id)
     {
         var issue = await _context.Issues.FindAsync(id);
         if (issue == null) return false;

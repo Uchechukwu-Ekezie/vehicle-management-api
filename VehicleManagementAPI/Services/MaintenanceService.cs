@@ -8,11 +8,11 @@ namespace VehicleManagementAPI.Services;
 public interface IMaintenanceService
 {
     Task<List<MaintenanceRecordDTO>> GetAllRecordsAsync();
-    Task<MaintenanceRecordDTO?> GetRecordByIdAsync(int id);
-    Task<List<MaintenanceRecordDTO>> GetRecordsByVehicleAsync(int vehicleId);
+    Task<MaintenanceRecordDTO?> GetRecordByIdAsync(Guid id);
+    Task<List<MaintenanceRecordDTO>> GetRecordsByVehicleAsync(Guid vehicleId);
     Task<MaintenanceRecordDTO> CreateRecordAsync(CreateMaintenanceRequest request);
-    Task<MaintenanceRecordDTO?> UpdateRecordAsync(int id, UpdateMaintenanceRequest request);
-    Task<bool> DeleteRecordAsync(int id);
+    Task<MaintenanceRecordDTO?> UpdateRecordAsync(Guid id, UpdateMaintenanceRequest request);
+    Task<bool> DeleteRecordAsync(Guid id);
     Task<List<MaintenanceAlert>> GetMaintenanceAlertsAsync();
 }
 
@@ -36,7 +36,7 @@ public class MaintenanceService : IMaintenanceService
             .ToListAsync();
     }
 
-    public async Task<MaintenanceRecordDTO?> GetRecordByIdAsync(int id)
+    public async Task<MaintenanceRecordDTO?> GetRecordByIdAsync(Guid id)
     {
         var record = await _context.MaintenanceRecords
             .Include(m => m.Vehicle)
@@ -46,7 +46,7 @@ public class MaintenanceService : IMaintenanceService
         return record == null ? null : MapToDTO(record);
     }
 
-    public async Task<List<MaintenanceRecordDTO>> GetRecordsByVehicleAsync(int vehicleId)
+    public async Task<List<MaintenanceRecordDTO>> GetRecordsByVehicleAsync(Guid vehicleId)
     {
         return await _context.MaintenanceRecords
             .Include(m => m.Vehicle)
@@ -86,7 +86,7 @@ public class MaintenanceService : IMaintenanceService
         return MapToDTO(createdRecord);
     }
 
-    public async Task<MaintenanceRecordDTO?> UpdateRecordAsync(int id, UpdateMaintenanceRequest request)
+    public async Task<MaintenanceRecordDTO?> UpdateRecordAsync(Guid id, UpdateMaintenanceRequest request)
     {
         var record = await _context.MaintenanceRecords
             .Include(m => m.Vehicle)
@@ -124,7 +124,7 @@ public class MaintenanceService : IMaintenanceService
         return MapToDTO(record);
     }
 
-    public async Task<bool> DeleteRecordAsync(int id)
+    public async Task<bool> DeleteRecordAsync(Guid id)
     {
         var record = await _context.MaintenanceRecords.FindAsync(id);
         if (record == null) return false;

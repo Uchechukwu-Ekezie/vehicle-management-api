@@ -2,7 +2,7 @@ namespace VehicleManagementAPI.DTOs;
 
 public class PartsInventoryDTO
 {
-    public int PartID { get; set; }
+    public Guid PartID { get; set; }
     public string Name { get; set; } = string.Empty;
     public string SKU { get; set; } = string.Empty;
     public int QuantityInStock { get; set; }

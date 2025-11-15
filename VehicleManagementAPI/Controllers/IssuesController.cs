@@ -27,7 +27,7 @@ public class IssuesController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<IssueDTO>> GetIssueById(int id)
+    public async Task<ActionResult<IssueDTO>> GetIssueById(Guid id)
     {
         var issue = await _issueService.GetIssueByIdAsync(id);
         if (issue == null)
@@ -37,7 +37,7 @@ public class IssuesController : ControllerBase
     }
 
     [HttpGet("vehicle/{vehicleId}")]
-    public async Task<ActionResult<List<IssueDTO>>> GetIssuesByVehicle(int vehicleId)
+    public async Task<ActionResult<List<IssueDTO>>> GetIssuesByVehicle(Guid vehicleId)
     {
         var issues = await _issueService.GetIssuesByVehicleAsync(vehicleId);
         return Ok(issues);
@@ -58,7 +58,7 @@ public class IssuesController : ControllerBase
         try
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out int reportedById))
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim, out Guid reportedById))
                 return Unauthorized();
 
             var issue = await _issueService.CreateIssueAsync(reportedById, request);
@@ -72,7 +72,7 @@ public class IssuesController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Admin,Mechanic")]
-    public async Task<ActionResult<IssueDTO>> UpdateIssue(int id, [FromBody] UpdateIssueRequest request)
+    public async Task<ActionResult<IssueDTO>> UpdateIssue(Guid id, [FromBody] UpdateIssueRequest request)
     {
         var issue = await _issueService.UpdateIssueAsync(id, request);
         if (issue == null)
@@ -83,7 +83,7 @@ public class IssuesController : ControllerBase
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> DeleteIssue(int id)
+    public async Task<ActionResult> DeleteIssue(Guid id)
     {
         var result = await _issueService.DeleteIssueAsync(id);
         if (!result)

@@ -8,11 +8,11 @@ namespace VehicleManagementAPI.Services;
 public interface ITripService
 {
     Task<List<TripDTO>> GetAllTripsAsync();
-    Task<TripDTO?> GetTripByIdAsync(int id);
-    Task<List<TripDTO>> GetTripsByDriverAsync(int driverId);
-    Task<List<TripDTO>> GetTripsByVehicleAsync(int vehicleId);
-    Task<TripDTO> StartTripAsync(int driverId, CreateTripRequest request);
-    Task<TripDTO?> EndTripAsync(int tripId, EndTripRequest request);
+    Task<TripDTO?> GetTripByIdAsync(Guid id);
+    Task<List<TripDTO>> GetTripsByDriverAsync(Guid driverId);
+    Task<List<TripDTO>> GetTripsByVehicleAsync(Guid vehicleId);
+    Task<TripDTO> StartTripAsync(Guid driverId, CreateTripRequest request);
+    Task<TripDTO?> EndTripAsync(Guid tripId, EndTripRequest request);
 }
 
 public class TripService : ITripService
@@ -33,7 +33,7 @@ public class TripService : ITripService
             .ToListAsync();
     }
 
-    public async Task<TripDTO?> GetTripByIdAsync(int id)
+    public async Task<TripDTO?> GetTripByIdAsync(Guid id)
     {
         var trip = await _context.Trips
             .Include(t => t.Vehicle)
@@ -43,7 +43,7 @@ public class TripService : ITripService
         return trip == null ? null : MapToDTO(trip);
     }
 
-    public async Task<List<TripDTO>> GetTripsByDriverAsync(int driverId)
+    public async Task<List<TripDTO>> GetTripsByDriverAsync(Guid driverId)
     {
         return await _context.Trips
             .Include(t => t.Vehicle)
@@ -53,7 +53,7 @@ public class TripService : ITripService
             .ToListAsync();
     }
 
-    public async Task<List<TripDTO>> GetTripsByVehicleAsync(int vehicleId)
+    public async Task<List<TripDTO>> GetTripsByVehicleAsync(Guid vehicleId)
     {
         return await _context.Trips
             .Include(t => t.Vehicle)
@@ -63,7 +63,7 @@ public class TripService : ITripService
             .ToListAsync();
     }
 
-    public async Task<TripDTO> StartTripAsync(int driverId, CreateTripRequest request)
+    public async Task<TripDTO> StartTripAsync(Guid driverId, CreateTripRequest request)
     {
         var vehicle = await _context.Vehicles.FindAsync(request.VehicleID);
         if (vehicle == null)
@@ -74,6 +74,7 @@ public class TripService : ITripService
 
         var trip = new Trip
         {
+            TripID = Guid.NewGuid(), // Generate UUID
             VehicleID = request.VehicleID,
             DriverID = driverId,
             StartTime = request.StartTime,
@@ -96,7 +97,7 @@ public class TripService : ITripService
         return MapToDTO(createdTrip);
     }
 
-    public async Task<TripDTO?> EndTripAsync(int tripId, EndTripRequest request)
+    public async Task<TripDTO?> EndTripAsync(Guid tripId, EndTripRequest request)
     {
         var trip = await _context.Trips
             .Include(t => t.Vehicle)

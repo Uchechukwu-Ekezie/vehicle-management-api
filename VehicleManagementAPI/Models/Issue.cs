@@ -6,14 +6,14 @@ namespace VehicleManagementAPI.Models;
 public class Issue
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int IssueID { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    public Guid IssueID { get; set; } = Guid.NewGuid();
 
     [Required]
-    public int VehicleID { get; set; }
+    public Guid VehicleID { get; set; }
 
     [Required]
-    public int ReportedByID { get; set; }
+    public Guid ReportedByID { get; set; }
 
     [Required]
     public DateTime ReportDate { get; set; } = DateTime.UtcNow;

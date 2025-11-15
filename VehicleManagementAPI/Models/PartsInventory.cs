@@ -6,8 +6,8 @@ namespace VehicleManagementAPI.Models;
 public class PartsInventory
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int PartID { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    public Guid PartID { get; set; } = Guid.NewGuid();
 
     [Required]
     [StringLength(200)]

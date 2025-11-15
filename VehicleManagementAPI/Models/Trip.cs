@@ -6,14 +6,14 @@ namespace VehicleManagementAPI.Models;
 public class Trip
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int TripID { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    public Guid TripID { get; set; } = Guid.NewGuid();
 
     [Required]
-    public int VehicleID { get; set; }
+    public Guid VehicleID { get; set; }
 
     [Required]
-    public int DriverID { get; set; }
+    public Guid DriverID { get; set; }
 
     [Required]
     public DateTime StartTime { get; set; }

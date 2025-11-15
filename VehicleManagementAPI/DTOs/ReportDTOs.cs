@@ -11,7 +11,7 @@ public class CostAnalyticsDTO
 
 public class CostByVehicle
 {
-    public int VehicleID { get; set; }
+    public Guid VehicleID { get; set; }
     public string VehicleInfo { get; set; } = string.Empty;
     public decimal TotalCost { get; set; }
     public int MaintenanceCount { get; set; }
@@ -34,7 +34,7 @@ public class CostByMonth
 
 public class FuelEfficiencyReport
 {
-    public int VehicleID { get; set; }
+    public Guid VehicleID { get; set; }
     public string VehicleInfo { get; set; } = string.Empty;
     public decimal AverageFuelEfficiency { get; set; }
     public decimal TotalFuelUsed { get; set; }

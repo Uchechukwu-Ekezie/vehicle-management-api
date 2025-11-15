@@ -6,8 +6,8 @@ namespace VehicleManagementAPI.Models;
 public class User
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int UserID { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    public Guid UserID { get; set; } = Guid.NewGuid();
 
     [Required]
     [StringLength(100)]

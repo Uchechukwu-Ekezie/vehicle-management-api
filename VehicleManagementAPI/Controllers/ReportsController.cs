@@ -37,7 +37,7 @@ public class ReportsController : ControllerBase
 
     [HttpGet("fuel-efficiency/vehicle/{vehicleId}")]
     [Authorize(Roles = "Admin,Driver,Finance")]
-    public async Task<ActionResult<FuelEfficiencyReport>> GetFuelEfficiencyByVehicle(int vehicleId)
+    public async Task<ActionResult<FuelEfficiencyReport>> GetFuelEfficiencyByVehicle(Guid vehicleId)
     {
         var report = await _reportingService.GetFuelEfficiencyByVehicleAsync(vehicleId);
         if (report == null)

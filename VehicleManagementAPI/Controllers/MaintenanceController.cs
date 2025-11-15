@@ -25,7 +25,7 @@ public class MaintenanceController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<MaintenanceRecordDTO>> GetRecordById(int id)
+    public async Task<ActionResult<MaintenanceRecordDTO>> GetRecordById(Guid id)
     {
         var record = await _maintenanceService.GetRecordByIdAsync(id);
         if (record == null)
@@ -35,7 +35,7 @@ public class MaintenanceController : ControllerBase
     }
 
     [HttpGet("vehicle/{vehicleId}")]
-    public async Task<ActionResult<List<MaintenanceRecordDTO>>> GetRecordsByVehicle(int vehicleId)
+    public async Task<ActionResult<List<MaintenanceRecordDTO>>> GetRecordsByVehicle(Guid vehicleId)
     {
         var records = await _maintenanceService.GetRecordsByVehicleAsync(vehicleId);
         return Ok(records);
@@ -58,7 +58,7 @@ public class MaintenanceController : ControllerBase
 
     [HttpPut("records/{id}")]
     [Authorize(Roles = "Admin,Mechanic")]
-    public async Task<ActionResult<MaintenanceRecordDTO>> UpdateRecord(int id, [FromBody] UpdateMaintenanceRequest request)
+    public async Task<ActionResult<MaintenanceRecordDTO>> UpdateRecord(Guid id, [FromBody] UpdateMaintenanceRequest request)
     {
         var record = await _maintenanceService.UpdateRecordAsync(id, request);
         if (record == null)
@@ -69,7 +69,7 @@ public class MaintenanceController : ControllerBase
 
     [HttpDelete("records/{id}")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> DeleteRecord(int id)
+    public async Task<ActionResult> DeleteRecord(Guid id)
     {
         var result = await _maintenanceService.DeleteRecordAsync(id);
         if (!result)
