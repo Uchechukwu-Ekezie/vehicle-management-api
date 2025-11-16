@@ -52,12 +52,20 @@ builder.Services.AddSwaggerGen(c =>
 // Configure MySQL database with Pomelo provider
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// Parse Railway's DATABASE_URL if present (format: mysql://user:password@host:port/database)
-var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-if (!string.IsNullOrEmpty(databaseUrl) && databaseUrl.StartsWith("mysql://"))
+// Use Railway's DATABASE_URL in Production, local MySQL in Development
+if (builder.Environment.IsProduction())
 {
-    var uri = new Uri(databaseUrl);
-    connectionString = $"Server={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};User={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};";
+    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    if (!string.IsNullOrEmpty(databaseUrl) && databaseUrl.StartsWith("mysql://"))
+    {
+        var uri = new Uri(databaseUrl);
+        connectionString = $"Server={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};User={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};";
+        Console.WriteLine($"Using Railway Database: {uri.Host}");
+    }
+}
+else
+{
+    Console.WriteLine($"Using Local Database: localhost:3306/vmsystem");
 }
 
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 0));

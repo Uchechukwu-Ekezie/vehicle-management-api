@@ -11,10 +11,12 @@ namespace VehicleManagementAPI.Controllers;
 public class PartsController : ControllerBase
 {
     private readonly IPartsService _partsService;
+    private readonly ILogger<PartsController> _logger;
 
-    public PartsController(IPartsService partsService)
+    public PartsController(IPartsService partsService, ILogger<PartsController> logger)
     {
         _partsService = partsService;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -42,7 +44,7 @@ public class PartsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Mechanic")]
     public async Task<ActionResult<PartsInventoryDTO>> CreatePart([FromBody] CreatePartRequest request)
     {
         try
@@ -52,7 +54,10 @@ public class PartsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(new { message = ex.Message });
+            // Log full exception including inner exception for debugging
+            _logger.LogError(ex, "Error creating part");
+            var inner = ex.InnerException?.Message;
+            return BadRequest(new { message = "An error occurred while saving the entity changes. See server logs for details.", error = ex.Message, innerException = inner });
         }
     }
 
