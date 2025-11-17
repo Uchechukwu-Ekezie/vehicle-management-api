@@ -1,5 +1,5 @@
 export interface User {
-  id: number;
+  id: string; // UUID as string
   userID?: string; // UUID from backend
   username: string;
   email: string;
@@ -109,12 +109,4 @@ export interface InspectionAlert {
   dueDate: string;
   daysUntilDue: number;
   isOverdue: boolean;
-}
-
-export interface User {
-  id: string; // UUID as string
-  username: string;
-  email: string;
-  role: "Admin" | "Driver" | "Mechanic" | "Finance";
-  token: string;
 }

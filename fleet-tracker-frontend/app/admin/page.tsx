@@ -282,7 +282,7 @@ export default async function AdminDashboard() {
             <div className="space-y-3">
               {alerts.map(
                 (
-                  alert: { id: number; vehicle: string; message: string },
+                  alert: { id: string; vehicle: string; message: string },
                   index: number
                 ) => (
                   <div

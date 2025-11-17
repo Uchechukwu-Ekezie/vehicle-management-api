@@ -45,13 +45,17 @@ const normalizeVehicle = (vehicle: any) => {
   // Convert UUID to string if needed
   const normalizeId = (id: any) => {
     if (id === null || id === undefined) return undefined;
-    return typeof id === 'string' ? id : id.toString();
+    return typeof id === "string" ? id : id.toString();
   };
 
   return {
     ...vehicle,
     // ID mapping: prioritize camelCase (vehicleID) as that's what .NET 8 returns, convert to string
-    id: normalizeId(vehicle.id) ?? normalizeId(vehicle.vehicleID) ?? normalizeId(vehicle.VehicleID) ?? "",
+    id:
+      normalizeId(vehicle.id) ??
+      normalizeId(vehicle.vehicleID) ??
+      normalizeId(vehicle.VehicleID) ??
+      "",
     vehicleID: normalizeId(vehicle.vehicleID) ?? normalizeId(vehicle.VehicleID),
     // Mileage mapping: backend uses currentMileage (camelCase)
     mileage:
@@ -65,8 +69,19 @@ const normalizeVehicle = (vehicle: any) => {
     model: vehicle.model ?? vehicle.Model ?? "",
     year: vehicle.year ?? vehicle.Year ?? new Date().getFullYear(),
     status: vehicle.status ?? vehicle.Status ?? "Available",
-    // Convert assignedDriverID to string if present
-    assignedDriverID: vehicle.assignedDriverID ? normalizeId(vehicle.assignedDriverID) : vehicle.assignedDriverID,
+    // Assigned driver mapping
+    assignedDriverID: vehicle.assignedDriverID
+      ? normalizeId(vehicle.assignedDriverID)
+      : vehicle.assignedDriverID ??
+        (vehicle.assignedDriverId
+          ? normalizeId(vehicle.assignedDriverId)
+          : vehicle.assignedDriverId),
+    assignedDriverName:
+      vehicle.assignedDriverName ??
+      vehicle.AssignedDriverName ??
+      vehicle.assignedDriver?.fullName ??
+      vehicle.assignedDriver?.username ??
+      "",
   };
 };
 
@@ -110,7 +125,7 @@ export const vehiclesApi = {
     // Remove frontend-specific fields if they exist
     delete backendData.mileage;
     delete backendData.id;
-    
+
     const response = await api.put(`/api/Vehicles/${id}`, backendData, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -155,17 +170,29 @@ const normalizeTrip = (trip: any) => {
 
   const normalizeId = (id: any) => {
     if (id === null || id === undefined) return undefined;
-    return typeof id === 'string' ? id : id.toString();
+    return typeof id === "string" ? id : id.toString();
   };
 
   return {
     ...trip,
-    id: normalizeId(trip.id) ?? normalizeId(trip.tripID) ?? normalizeId(trip.TripID) ?? "",
+    id:
+      normalizeId(trip.id) ??
+      normalizeId(trip.tripID) ??
+      normalizeId(trip.TripID) ??
+      "",
     tripID: normalizeId(trip.tripID) ?? normalizeId(trip.TripID),
-    vehicleId: normalizeId(trip.vehicleId) ?? normalizeId(trip.vehicleID) ?? normalizeId(trip.VehicleID) ?? "",
+    vehicleId:
+      normalizeId(trip.vehicleId) ??
+      normalizeId(trip.vehicleID) ??
+      normalizeId(trip.VehicleID) ??
+      "",
     vehicleID: normalizeId(trip.vehicleID) ?? normalizeId(trip.VehicleID),
     vehicleInfo: trip.vehicleInfo,
-    driverId: normalizeId(trip.driverId) ?? normalizeId(trip.driverID) ?? normalizeId(trip.DriverID) ?? "",
+    driverId:
+      normalizeId(trip.driverId) ??
+      normalizeId(trip.driverID) ??
+      normalizeId(trip.DriverID) ??
+      "",
     driverID: normalizeId(trip.driverID) ?? normalizeId(trip.DriverID),
     driverName: trip.driverName,
     startDate: trip.startDate ?? trip.startTime,
@@ -214,7 +241,7 @@ export const tripsApi = {
       startMileage: data.startMileage ?? 0,
       notes: data.notes ?? data.purpose,
     };
-    
+
     const response = await api.post("/api/Trips/start", backendData, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -235,13 +262,52 @@ export const tripsApi = {
   },
 };
 
+// Helper function to normalize maintenance data from API
+const normalizeMaintenance = (record: any) => {
+  if (!record) return record;
+
+  const normalizeId = (id: any) => {
+    if (id === null || id === undefined) return undefined;
+    return typeof id === "string" ? id : id.toString();
+  };
+
+  return {
+    ...record,
+    id:
+      normalizeId(record.id) ??
+      normalizeId(record.recordID) ??
+      normalizeId(record.RecordID) ??
+      "",
+    recordID: normalizeId(record.recordID) ?? normalizeId(record.RecordID),
+    vehicleId:
+      normalizeId(record.vehicleId) ??
+      normalizeId(record.vehicleID) ??
+      normalizeId(record.VehicleID) ??
+      "",
+    vehicleID: normalizeId(record.vehicleID) ?? normalizeId(record.VehicleID),
+    vehicleInfo: record.vehicleInfo,
+    maintenanceType: record.maintenanceType ?? record.MaintenanceType ?? "",
+    scheduledDate:
+      record.scheduledDate ?? record.ScheduledDate ?? record.scheduledTime,
+    completedDate:
+      record.completedDate ?? record.CompletionDate ?? record.completedTime,
+    cost: record.cost ?? record.Cost ?? 0,
+    mechanicNotes:
+      record.mechanicNotes ?? record.MechanicNotes ?? record.description,
+    status: record.status ?? record.Status ?? "Scheduled",
+    mileageAtService:
+      record.mileageAtService ?? record.MileageAtService ?? undefined,
+  };
+};
+
 // Maintenance API
 export const maintenanceApi = {
   getAll: async (token: string) => {
     const response = await api.get("/api/Maintenance", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data;
+    const records = Array.isArray(response.data) ? response.data : [];
+    return records.map(normalizeMaintenance);
   },
   create: async (data: any, token: string) => {
     // Backend expects POST to /api/Maintenance/schedule
@@ -265,19 +331,33 @@ const normalizeIssue = (issue: any) => {
 
   const normalizeId = (id: any) => {
     if (id === null || id === undefined) return undefined;
-    return typeof id === 'string' ? id : id.toString();
+    return typeof id === "string" ? id : id.toString();
   };
 
   return {
     ...issue,
-    id: normalizeId(issue.id) ?? normalizeId(issue.issueID) ?? normalizeId(issue.IssueID) ?? "",
+    id:
+      normalizeId(issue.id) ??
+      normalizeId(issue.issueID) ??
+      normalizeId(issue.IssueID) ??
+      "",
     issueID: normalizeId(issue.issueID) ?? normalizeId(issue.IssueID),
-    vehicleId: normalizeId(issue.vehicleId) ?? normalizeId(issue.vehicleID) ?? normalizeId(issue.VehicleID) ?? "",
+    vehicleId:
+      normalizeId(issue.vehicleId) ??
+      normalizeId(issue.vehicleID) ??
+      normalizeId(issue.VehicleID) ??
+      "",
     vehicleID: normalizeId(issue.vehicleID) ?? normalizeId(issue.VehicleID),
     vehicleInfo: issue.vehicleInfo,
-    reportedById: normalizeId(issue.reportedById) ?? normalizeId(issue.reportedByID) ?? normalizeId(issue.ReportedByID) ?? "",
-    reportedByID: normalizeId(issue.reportedByID) ?? normalizeId(issue.ReportedByID),
-    reportedBy: issue.reportedBy ?? issue.reportedByName ?? issue.ReportedByName ?? "",
+    reportedById:
+      normalizeId(issue.reportedById) ??
+      normalizeId(issue.reportedByID) ??
+      normalizeId(issue.ReportedByID) ??
+      "",
+    reportedByID:
+      normalizeId(issue.reportedByID) ?? normalizeId(issue.ReportedByID),
+    reportedBy:
+      issue.reportedBy ?? issue.reportedByName ?? issue.ReportedByName ?? "",
     reportedByName: issue.reportedByName ?? issue.ReportedByName,
     reportedDate: issue.reportedDate ?? issue.reportDate ?? issue.ReportDate,
     reportDate: issue.reportDate ?? issue.ReportDate ?? issue.reportedDate,
@@ -285,7 +365,8 @@ const normalizeIssue = (issue: any) => {
     status: issue.status ?? issue.Status ?? "Open",
     severity: issue.severity ?? issue.priority ?? issue.Priority ?? "Medium", // Map priority to severity
     priority: issue.priority ?? issue.Priority ?? issue.severity ?? "Medium",
-    resolvedDate: issue.resolvedDate ?? issue.resolvedDate ?? issue.ResolvedDate,
+    resolvedDate:
+      issue.resolvedDate ?? issue.resolvedDate ?? issue.ResolvedDate,
     resolution: issue.resolution ?? issue.Resolution,
   };
 };
@@ -322,7 +403,7 @@ export const issuesApi = {
       description: data.description,
       priority: data.priority ?? data.severity ?? "Medium", // Map severity to priority
     };
-    
+
     const response = await api.post("/api/Issues", backendData, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -336,14 +417,18 @@ const normalizeInspection = (inspection: any) => {
 
   const normalizeId = (id: any) => {
     if (id === null || id === undefined) return undefined;
-    return typeof id === 'string' ? id : id.toString();
+    return typeof id === "string" ? id : id.toString();
   };
 
   return {
     ...inspection,
-    id: normalizeId(inspection.id) ?? normalizeId(inspection.inspectionID) ?? "",
+    id:
+      normalizeId(inspection.id) ?? normalizeId(inspection.inspectionID) ?? "",
     inspectionID: normalizeId(inspection.inspectionID),
-    vehicleId: normalizeId(inspection.vehicleId) ?? normalizeId(inspection.vehicleID) ?? "",
+    vehicleId:
+      normalizeId(inspection.vehicleId) ??
+      normalizeId(inspection.vehicleID) ??
+      "",
     vehicleID: normalizeId(inspection.vehicleID),
     vehicleInfo: inspection.vehicleInfo,
     inspectionType: inspection.inspectionType,
@@ -387,9 +472,12 @@ export const inspectionsApi = {
     return inspections.map(normalizeInspection);
   },
   getUpcoming: async (daysAhead: number = 30, token: string) => {
-    const response = await api.get(`/api/Inspections/upcoming?daysAhead=${daysAhead}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await api.get(
+      `/api/Inspections/upcoming?daysAhead=${daysAhead}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     const inspections = Array.isArray(response.data) ? response.data : [];
     return inspections.map(normalizeInspection);
   },
@@ -401,14 +489,14 @@ export const inspectionsApi = {
   },
   create: async (data: any, token: string) => {
     // Map frontend fields to backend DTO fields
-    const backendData = {
+    const backendData: any = {
       vehicleID: data.vehicleId ?? data.vehicleID,
       inspectionType: data.inspectionType,
       dueDate: data.dueDate,
       documentLink: data.documentLink,
       notes: data.notes,
     };
-    // Remove frontend-specific fields
+    // Remove frontend-specific fields if they exist
     delete backendData.vehicleId;
     delete backendData.id;
     delete backendData.inspectionID;
@@ -423,8 +511,10 @@ export const inspectionsApi = {
     const backendData: any = {};
     if (data.dueDate) backendData.dueDate = data.dueDate;
     if (data.completionDate) backendData.completionDate = data.completionDate;
-    if (data.isCompliant !== undefined) backendData.isCompliant = data.isCompliant;
-    if (data.documentLink !== undefined) backendData.documentLink = data.documentLink;
+    if (data.isCompliant !== undefined)
+      backendData.isCompliant = data.isCompliant;
+    if (data.documentLink !== undefined)
+      backendData.documentLink = data.documentLink;
     if (data.notes !== undefined) backendData.notes = data.notes;
 
     const response = await api.put(`/api/Inspections/${id}`, backendData, {
@@ -448,16 +538,46 @@ export const partsApi = {
     return response.data;
   },
   create: async (data: any, token: string) => {
-    const response = await api.post("/api/Parts", data, {
+    // Map frontend fields to backend CreatePartRequest
+    const backendData = {
+      Name: data.partName ?? data.name ?? "",
+      SKU: data.partNumber ?? data.sku ?? "",
+      QuantityInStock: data.quantity ?? data.quantityInStock ?? 0,
+      UnitPrice: data.unitCost ?? data.unitPrice ?? 0,
+      MinimumStockLevel: data.minStockLevel ?? data.minimumStockLevel ?? null,
+      Supplier: data.supplier ?? null,
+      Description: data.description ?? null,
+    };
+
+    const response = await api.post("/api/Parts", backendData, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
   update: async (id: number, data: any, token: string) => {
-    const response = await api.put(`/api/Parts/${id}`, data, {
+    // Map frontend fields to backend UpdatePartRequest
+    const backendData: any = {};
+    if (data.partName !== undefined) backendData.Name = data.partName;
+    if (data.partNumber !== undefined) backendData.SKU = data.partNumber;
+    if (data.quantity !== undefined)
+      backendData.QuantityInStock = data.quantity;
+    if (data.unitCost !== undefined) backendData.UnitPrice = data.unitCost;
+    if (data.minStockLevel !== undefined)
+      backendData.MinimumStockLevel = data.minStockLevel;
+    if (data.supplier !== undefined) backendData.Supplier = data.supplier;
+    if (data.description !== undefined)
+      backendData.Description = data.description;
+
+    const response = await api.put(`/api/Parts/${id}`, backendData, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
+  },
+  delete: async (id: number | string, token: string) => {
+    // Backend expects DELETE /api/Parts/{id} where id is a Guid (UUID)
+    await api.delete(`/api/Parts/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
   },
 };
 

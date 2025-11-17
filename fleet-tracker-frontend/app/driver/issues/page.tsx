@@ -52,9 +52,11 @@ export default function DriverIssuesPage() {
 
       const driverId = user.id as string;
 
-      // Get assigned vehicle
+      // Get driver's assigned vehicle (match by assignedDriverID, fallback to status)
       const vehicles = await vehiclesApi.getAll(token);
-      const assigned = vehicles.find((v: Vehicle) => v.status === "InUse");
+      const assigned =
+        vehicles.find((v: Vehicle) => v.assignedDriverID === driverId) ||
+        vehicles.find((v: Vehicle) => v.status === "InUse");
       setAssignedVehicle(assigned || null);
 
       // Get driver's reported issues (not all issues - drivers can only see their own)

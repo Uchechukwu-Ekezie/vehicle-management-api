@@ -52,9 +52,13 @@ export default function AdminReportsPage() {
   // Fleet Statistics
   const getFleetStats = () => {
     const totalVehicles = vehicles.length;
-    const activeVehicles = vehicles.filter((v) => v.status === "Active").length;
+    // Treat Available and InUse as active vehicles
+    const activeVehicles = vehicles.filter(
+      (v) => v.status === "Available" || v.status === "InUse"
+    ).length;
+    // UnderMaintenance are considered in maintenance
     const maintenanceVehicles = vehicles.filter(
-      (v) => v.status === "Maintenance"
+      (v) => v.status === "UnderMaintenance"
     ).length;
     const avgMileage =
       vehicles.reduce((sum, v) => sum + (v.currentMileage || v.mileage || 0), 0) / totalVehicles ||
@@ -66,7 +70,7 @@ export default function AdminReportsPage() {
   // Trip Statistics
   const getTripStats = () => {
     const filteredTrips = trips.filter((trip) => {
-      const tripDate = new Date(trip.startTime);
+      const tripDate = new Date(trip.startDate);
       return (
         tripDate >= new Date(dateRange.startDate) &&
         tripDate <= new Date(dateRange.endDate)
@@ -74,8 +78,9 @@ export default function AdminReportsPage() {
     });
 
     const totalTrips = filteredTrips.length;
+    // Treat trips with an endMileage as completed
     const completedTrips = filteredTrips.filter(
-      (t) => t.status === "Completed"
+      (t) => t.endMileage !== undefined && t.endMileage !== null
     ).length;
     const totalDistance = filteredTrips
       .filter((t) => t.endMileage && t.startMileage)
@@ -189,7 +194,7 @@ export default function AdminReportsPage() {
 
   const exportTripReport = () => {
     const filteredTrips = trips.filter((trip) => {
-      const tripDate = new Date(trip.startTime);
+      const tripDate = new Date(trip.startDate);
       return (
         tripDate >= new Date(dateRange.startDate) &&
         tripDate <= new Date(dateRange.endDate)
@@ -200,12 +205,12 @@ export default function AdminReportsPage() {
       ID: t.id,
       VehicleID: t.vehicleId,
       DriverID: t.driverId,
-      StartTime: formatDate(t.startTime),
-      EndTime: t.endTime ? formatDate(t.endTime) : "In Progress",
+      StartTime: formatDate(t.startDate),
+      EndTime: t.endDate ? formatDate(t.endDate) : "In Progress",
       Distance:
         t.endMileage && t.startMileage ? t.endMileage - t.startMileage : 0,
       FuelUsed: t.fuelUsed || 0,
-      Status: t.status,
+      Status: t.endDate ? "Completed" : "In Progress",
     }));
     exportToCSV(data, "trip_report");
   };
@@ -423,9 +428,11 @@ export default function AdminReportsPage() {
                         <td className="py-3 px-4 text-center">
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                              vehicle.status === "Active"
+                              vehicle.status === "Available"
                                 ? "bg-green-100 text-green-800"
-                                : vehicle.status === "Maintenance"
+                                : vehicle.status === "InUse"
+                                ? "bg-blue-100 text-blue-800"
+                                : vehicle.status === "UnderMaintenance"
                                 ? "bg-orange-100 text-orange-800"
                                 : "bg-gray-100 text-gray-800"
                             }`}
@@ -547,7 +554,7 @@ export default function AdminReportsPage() {
                   <tbody>
                     {trips
                       .filter((trip) => {
-                        const tripDate = new Date(trip.startTime);
+                        const tripDate = new Date(trip.startDate);
                         return (
                           tripDate >= new Date(dateRange.startDate) &&
                           tripDate <= new Date(dateRange.endDate)
@@ -559,7 +566,7 @@ export default function AdminReportsPage() {
                             Vehicle #{trip.vehicleId}
                           </td>
                           <td className="py-3 px-4 text-sm">
-                            {formatDate(trip.startTime)}
+                            {formatDate(trip.startDate)}
                           </td>
                           <td className="py-3 px-4 text-sm text-right">
                             {trip.endMileage && trip.startMileage
@@ -574,15 +581,24 @@ export default function AdminReportsPage() {
                               : "-"}
                           </td>
                           <td className="py-3 px-4 text-center">
-                            <span
-                              className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                trip.status === "Completed"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-blue-100 text-blue-800"
-                              }`}
-                            >
-                              {trip.status}
-                            </span>
+                            {(() => {
+                              const isCompleted =
+                                trip.endMileage !== undefined &&
+                                trip.endMileage !== null;
+                              const statusLabel = isCompleted
+                                ? "Completed"
+                                : "In Progress";
+                              const statusClass = isCompleted
+                                ? "bg-green-100 text-green-800"
+                                : "bg-blue-100 text-blue-800";
+                              return (
+                                <span
+                                  className={`px-3 py-1 rounded-full text-xs font-semibold ${statusClass}`}
+                                >
+                                  {statusLabel}
+                                </span>
+                              );
+                            })()}
                           </td>
                         </tr>
                       ))}

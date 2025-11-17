@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { vehiclesApi, tripsApi, maintenanceApi } from "@/lib/api";
+import { vehiclesApi, tripsApi, maintenanceApi, issuesApi } from "@/lib/api";
 import { getUserFromToken } from "@/lib/auth";
 import { Vehicle, Trip, MaintenanceRecord } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
@@ -39,23 +39,29 @@ export default function DriverDashboardPage() {
 
         const driverId = user.id as string;
 
-        // Get driver's assigned vehicle
+        // Get driver's assigned vehicle (match by assignedDriverID, fallback to status)
         const vehicles = await vehiclesApi.getAll(token);
-        const assigned = vehicles.find((v: Vehicle) => v.status === "InUse"); // In real app, filter by driver ID
+        const assigned =
+          vehicles.find(
+            (v: Vehicle) => v.assignedDriverID === driverId
+          ) || vehicles.find((v: Vehicle) => v.status === "InUse");
         setAssignedVehicle(assigned || null);
 
         // Get driver's trips (not all trips - drivers can only see their own)
         const trips = await tripsApi.getByDriver(driverId, token);
         setRecentTrips(trips.slice(0, 5)); // Get last 5 trips
 
-        // Calculate stats
+        // Calculate stats from completed trips only (those with an endMileage)
         const totalTrips = trips.length;
-        const totalMileage = trips.reduce(
+        const completedTrips = trips.filter(
+          (t: Trip) => t.endMileage !== undefined && t.endMileage !== null
+        );
+        const totalMileage = completedTrips.reduce(
           (sum: number, t: Trip) =>
-            sum + ((t.endMileage || 0) - t.startMileage),
+            sum + (((t.endMileage as number) || 0) - t.startMileage),
           0
         );
-        const tripsWithFuel = trips.filter(
+        const tripsWithFuel = completedTrips.filter(
           (t: Trip) => t.fuelUsed && t.fuelUsed > 0
         );
         const avgFuel =
@@ -66,11 +72,16 @@ export default function DriverDashboardPage() {
               ) / tripsWithFuel.length
             : 0;
 
+        // Get driver's reported issues count
+        const driverIssues = await issuesApi.getByReportedBy(driverId, token);
+
         setStats({
           totalTrips,
           totalMileage,
           averageFuelConsumption: avgFuel,
-          issuesReported: 0, // This would come from issues API
+          issuesReported: Array.isArray(driverIssues)
+            ? driverIssues.length
+            : 0,
         });
 
         // Get upcoming maintenance (if assigned vehicle)

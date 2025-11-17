@@ -12,7 +12,7 @@ interface Part {
   partNumber: string;
   quantity: number;
   minStockLevel: number;
-  unitCost: number;
+  unitCost?: number;
 }
 
 export default function MechanicInventoryPage() {
@@ -84,7 +84,7 @@ export default function MechanicInventoryPage() {
       partNumber: part.partNumber,
       quantity: part.quantity,
       minStockLevel: part.minStockLevel,
-      unitCost: part.unitCost,
+      unitCost: part.unitCost ?? 0,
     });
     setShowForm(true);
   };
@@ -380,7 +380,9 @@ export default function MechanicInventoryPage() {
                     <h3 className="font-bold text-lg text-gray-900">
                       {part.partName}
                     </h3>
-                    <p className="text-base text-gray-700">#{part.partNumber}</p>
+                    <p className="text-base text-gray-700">
+                      #{part.partNumber}
+                    </p>
                   </div>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStockStatusColor(
@@ -407,13 +409,13 @@ export default function MechanicInventoryPage() {
                   <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
                     <span className="text-sm text-green-700">Unit Cost</span>
                     <span className="font-bold text-green-900">
-                      ${part.unitCost.toFixed(2)}
+                      ${(part.unitCost ?? 0).toFixed(2)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-100">
                     <span className="text-sm text-purple-700">Total Value</span>
                     <span className="font-bold text-purple-900">
-                      ${(part.quantity * part.unitCost).toFixed(2)}
+                      ${(part.quantity * (part.unitCost ?? 0)).toFixed(2)}
                     </span>
                   </div>
                 </div>
