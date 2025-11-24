@@ -55,12 +55,14 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 // Use Railway's DATABASE_URL in Production, local MySQL in Development
 if (builder.Environment.IsProduction())
 {
-    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL") ??
+                      Environment.GetEnvironmentVariable("MYSQL_PUBLIC_URL");
+
     if (!string.IsNullOrEmpty(databaseUrl) && databaseUrl.StartsWith("mysql://"))
     {
         var uri = new Uri(databaseUrl);
         connectionString = $"Server={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};User={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};";
-        Console.WriteLine($"Using Railway Database: {uri.Host}");
+        Console.WriteLine($"Using Railway Database: {uri.Host}:{uri.Port}");
     }
     else
     {
@@ -68,7 +70,7 @@ if (builder.Environment.IsProduction())
         var host = Environment.GetEnvironmentVariable("MYSQLHOST");
         var port = Environment.GetEnvironmentVariable("MYSQLPORT");
         var user = Environment.GetEnvironmentVariable("MYSQLUSER");
-        var password = Environment.GetEnvironmentVariable("MYSQLPASSWORD");
+        var password = Environment.GetEnvironmentVariable("MYSQL_ROOT_PASSWORD");
         var database = Environment.GetEnvironmentVariable("MYSQLDATABASE");
 
         if (!string.IsNullOrEmpty(host) && !string.IsNullOrEmpty(port) &&
@@ -105,7 +107,9 @@ builder.Services.AddScoped<IReportingService, ReportingService>();
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"] ?? throw new Exception("JWT SecretKey not configured");
+var secretKey = jwtSettings["SecretKey"] ??
+                Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ??
+                throw new Exception("JWT SecretKey not configured");
 
 builder.Services.AddAuthentication(options =>
 {
