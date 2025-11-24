@@ -33,21 +33,26 @@ namespace VehicleManagementAPI.Controllers
         }
 
         /// <summary>
-        /// Detailed health check with database connectivity
+        /// Debug endpoint to check environment variables
         /// </summary>
-        [HttpGet("detailed")]
-        public IActionResult GetDetailedHealth([FromServices] Data.ApplicationDbContext dbContext)
+        [HttpGet("debug")]
+        public IActionResult GetDebugInfo()
         {
-            var canConnectToDatabase = false;
-            string databaseStatus = "Unknown";
+            var debug = new
+            {
+                environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
+                database_url = Environment.GetEnvironmentVariable("DATABASE_URL"),
+                mysql_host = Environment.GetEnvironmentVariable("MYSQLHOST"),
+                mysql_port = Environment.GetEnvironmentVariable("MYSQLPORT"),
+                mysql_user = Environment.GetEnvironmentVariable("MYSQLUSER"),
+                mysql_password = Environment.GetEnvironmentVariable("MYSQLPASSWORD") != null ? "***" : null,
+                mysql_database = Environment.GetEnvironmentVariable("MYSQLDATABASE"),
+                jwt_secret = Environment.GetEnvironmentVariable("JWT_SECRET_KEY") != null ? "***" : null,
+                connection_string = _configuration.GetConnectionString("DefaultConnection")
+            };
 
-            try
-            {
-                canConnectToDatabase = dbContext.Database.CanConnect();
-                databaseStatus = canConnectToDatabase ? "Connected" : "Disconnected";
-            }
-            catch (Exception ex)
-            {
+            return Ok(debug);
+        }
                 databaseStatus = $"Error: {ex.Message}";
             }
 
