@@ -55,41 +55,67 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 // Use Railway's DATABASE_URL in Production, local MySQL in Development
 if (builder.Environment.IsProduction())
 {
+    Console.WriteLine("=== Production Environment ===");
+    
     var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL") ??
                       Environment.GetEnvironmentVariable("MYSQL_PUBLIC_URL");
 
+    Console.WriteLine($"DATABASE_URL: {(Environment.GetEnvironmentVariable("DATABASE_URL") != null ? "Set" : "Not set")}");
+    Console.WriteLine($"MYSQL_PUBLIC_URL: {(Environment.GetEnvironmentVariable("MYSQL_PUBLIC_URL") != null ? "Set" : "Not set")}");
+
     if (!string.IsNullOrEmpty(databaseUrl) && databaseUrl.StartsWith("mysql://"))
     {
-        var uri = new Uri(databaseUrl);
-        connectionString = $"Server={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};User={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};";
-        Console.WriteLine($"Using Railway Database: {uri.Host}:{uri.Port}");
+        try
+        {
+            var uri = new Uri(databaseUrl);
+            var userInfo = uri.UserInfo.Split(':');
+            connectionString = $"Server={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};User={userInfo[0]};Password={userInfo[1]};SslMode=Required;";
+            Console.WriteLine($"✓ Using Railway Database URL: {uri.Host}:{uri.Port}/{uri.AbsolutePath.TrimStart('/')}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR parsing database URL: {ex.Message}");
+            throw;
+        }
     }
     else
     {
         // Fallback to individual Railway MySQL variables
         var host = Environment.GetEnvironmentVariable("MYSQLHOST");
         var port = Environment.GetEnvironmentVariable("MYSQLPORT");
-        var user = Environment.GetEnvironmentVariable("MYSQLUSER");
+        var user = Environment.GetEnvironmentVariable("MYSQLUSER") ?? "root";
         var password = Environment.GetEnvironmentVariable("MYSQL_ROOT_PASSWORD");
-        var database = Environment.GetEnvironmentVariable("MYSQLDATABASE");
+        var database = Environment.GetEnvironmentVariable("MYSQLDATABASE") ?? "railway";
 
-        if (!string.IsNullOrEmpty(host) && !string.IsNullOrEmpty(port) &&
-            !string.IsNullOrEmpty(user) && !string.IsNullOrEmpty(password) &&
-            !string.IsNullOrEmpty(database))
+        Console.WriteLine($"MYSQLHOST: {(host != null ? "Set" : "Not set")}");
+        Console.WriteLine($"MYSQLPORT: {(port != null ? "Set" : "Not set")}");
+        Console.WriteLine($"MYSQL_ROOT_PASSWORD: {(password != null ? "Set" : "Not set")}");
+        Console.WriteLine($"MYSQLDATABASE: {database}");
+
+        if (!string.IsNullOrEmpty(host) && !string.IsNullOrEmpty(port) && !string.IsNullOrEmpty(password))
         {
-            connectionString = $"Server={host};Port={port};Database={database};User={user};Password={password};";
-            Console.WriteLine($"Using Railway MySQL Variables: {host}:{port}/{database}");
+            connectionString = $"Server={host};Port={port};Database={database};User={user};Password={password};SslMode=Required;";
+            Console.WriteLine($"✓ Using Railway MySQL Variables: {host}:{port}/{database}");
         }
         else
         {
             Console.WriteLine("ERROR: No database configuration found in Railway environment variables");
+            throw new Exception("Database configuration is missing in production environment");
         }
     }
 }
 else
 {
+    Console.WriteLine($"=== Development Environment ===");
     Console.WriteLine($"Using Local Database: localhost:3306/vmsystem");
 }
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new Exception("Connection string is null or empty!");
+}
+
+Console.WriteLine($"Final connection string length: {connectionString.Length}");
 
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 0));
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
