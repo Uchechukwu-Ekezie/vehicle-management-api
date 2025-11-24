@@ -91,7 +91,9 @@ public class AuthService : IAuthService
     private string GenerateJwtToken(User user)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
-        var secretKey = jwtSettings["SecretKey"] ?? throw new Exception("JWT SecretKey not configured");
+        var secretKey = jwtSettings["SecretKey"] ?? 
+                        Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ?? 
+                        throw new Exception("JWT SecretKey not configured");
         var issuer = jwtSettings["Issuer"] ?? "VehicleManagementAPI";
         var audience = jwtSettings["Audience"] ?? "VehicleManagementClient";
         var expirationMinutes = int.Parse(jwtSettings["ExpirationMinutes"] ?? "1440");
