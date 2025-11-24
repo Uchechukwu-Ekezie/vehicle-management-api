@@ -55,7 +55,7 @@ artifacts/
 
 # User-specific files
 appsettings.Development.json
-appsettings.Production.json
+# appsettings.Production.json - Now tracked for CORS config
 *.user
 *.rsuser
 
