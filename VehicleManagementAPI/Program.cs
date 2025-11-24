@@ -62,6 +62,27 @@ if (builder.Environment.IsProduction())
         connectionString = $"Server={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};User={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};";
         Console.WriteLine($"Using Railway Database: {uri.Host}");
     }
+    else
+    {
+        // Fallback to individual Railway MySQL variables
+        var host = Environment.GetEnvironmentVariable("MYSQLHOST");
+        var port = Environment.GetEnvironmentVariable("MYSQLPORT");
+        var user = Environment.GetEnvironmentVariable("MYSQLUSER");
+        var password = Environment.GetEnvironmentVariable("MYSQLPASSWORD");
+        var database = Environment.GetEnvironmentVariable("MYSQLDATABASE");
+
+        if (!string.IsNullOrEmpty(host) && !string.IsNullOrEmpty(port) &&
+            !string.IsNullOrEmpty(user) && !string.IsNullOrEmpty(password) &&
+            !string.IsNullOrEmpty(database))
+        {
+            connectionString = $"Server={host};Port={port};Database={database};User={user};Password={password};";
+            Console.WriteLine($"Using Railway MySQL Variables: {host}:{port}/{database}");
+        }
+        else
+        {
+            Console.WriteLine("ERROR: No database configuration found in Railway environment variables");
+        }
+    }
 }
 else
 {
