@@ -53,24 +53,5 @@ namespace VehicleManagementAPI.Controllers
 
             return Ok(debug);
         }
-                databaseStatus = $"Error: {ex.Message}";
-            }
-
-            var health = new
-            {
-                status = canConnectToDatabase ? "Healthy" : "Degraded",
-                timestamp = DateTime.UtcNow,
-                environment = _configuration["ASPNETCORE_ENVIRONMENT"] ?? "Unknown",
-                version = "1.0.0",
-                service = "Vehicle Management API",
-                database = new
-                {
-                    status = databaseStatus,
-                    connected = canConnectToDatabase
-                }
-            };
-
-            return canConnectToDatabase ? Ok(health) : StatusCode(503, health);
-        }
     }
 }
