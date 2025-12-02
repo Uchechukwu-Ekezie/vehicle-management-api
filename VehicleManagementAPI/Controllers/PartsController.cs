@@ -72,7 +72,7 @@ public class PartsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Mechanic")]
     public async Task<ActionResult> DeletePart(Guid id)
     {
         var result = await _partsService.DeletePartAsync(id);
