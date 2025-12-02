@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// Fleet Tracker Frontend API Configuration - Points to deployed backend
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://vehicle-management-api-production.up.railway.app";
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -529,13 +530,54 @@ export const inspectionsApi = {
   },
 };
 
+// Helper function to normalize parts inventory data from API
+// Backend returns: partID, name, sku, quantityInStock, unitPrice, minimumStockLevel, supplier, description, isLowStock
+const normalizePart = (part: any) => {
+  if (!part) return part;
+
+  const normalizeId = (id: any) => {
+    if (id === null || id === undefined) return undefined;
+    return typeof id === "string" ? id : id.toString();
+  };
+
+  return {
+    ...part,
+    id:
+      normalizeId(part.id) ??
+      normalizeId(part.partID) ??
+      normalizeId(part.PartID) ??
+      part.sku ??
+      "",
+    partID: normalizeId(part.partID) ?? normalizeId(part.PartID),
+    // Map backend 'name' to frontend 'partName'
+    partName: part.partName ?? part.name ?? part.Name ?? "",
+    // Map backend 'sku' to frontend 'partNumber'
+    partNumber: part.partNumber ?? part.sku ?? part.SKU ?? "",
+    // Map backend 'quantityInStock' to frontend 'quantity'
+    quantity: part.quantity ?? part.quantityInStock ?? part.QuantityInStock ?? 0,
+    // Map backend 'minimumStockLevel' to frontend 'minStockLevel'
+    minStockLevel:
+      part.minStockLevel ??
+      part.minimumStockLevel ??
+      part.MinimumStockLevel ??
+      0,
+    // Map backend 'unitPrice' to frontend 'unitCost'
+    unitCost: part.unitCost ?? part.unitPrice ?? part.UnitPrice ?? 0,
+    // Include backend fields
+    supplier: part.supplier ?? null,
+    description: part.description ?? null,
+    isLowStock: part.isLowStock ?? false,
+  };
+};
+
 // Parts API
 export const partsApi = {
   getAll: async (token: string) => {
     const response = await api.get("/api/Parts", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data;
+    const parts = Array.isArray(response.data) ? response.data : [];
+    return parts.map(normalizePart);
   },
   create: async (data: any, token: string) => {
     // Map frontend fields to backend CreatePartRequest
@@ -552,9 +594,9 @@ export const partsApi = {
     const response = await api.post("/api/Parts", backendData, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data;
+    return normalizePart(response.data);
   },
-  update: async (id: number, data: any, token: string) => {
+  update: async (id: string | number, data: any, token: string) => {
     // Map frontend fields to backend UpdatePartRequest
     const backendData: any = {};
     if (data.partName !== undefined) backendData.Name = data.partName;
@@ -571,9 +613,9 @@ export const partsApi = {
     const response = await api.put(`/api/Parts/${id}`, backendData, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data;
+    return normalizePart(response.data);
   },
-  delete: async (id: number | string, token: string) => {
+  delete: async (id: string | number, token: string) => {
     // Backend expects DELETE /api/Parts/{id} where id is a Guid (UUID)
     await api.delete(`/api/Parts/${id}`, {
       headers: { Authorization: `Bearer ${token}` },

@@ -22,9 +22,11 @@ export default async function MechanicLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-orange-50 to-red-50">
       <Sidebar role="Mechanic" username={user.username as string} />
-      <div className="lg:ml-64 p-8">{children}</div>
+      <main className="lg:pl-64 pt-16 lg:pt-0">
+        <div className="p-6 max-w-7xl mx-auto">{children}</div>
+      </main>
     </div>
   );
 }

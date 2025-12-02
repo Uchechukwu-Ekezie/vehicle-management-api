@@ -5,14 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { partsApi } from "@/lib/api";
+import { getUserFromToken } from "@/lib/auth";
+import { DeletePartModal } from "@/components/modals/delete-part-modal";
 
 interface Part {
-  id: number;
+  id: string | number; // UUID as string or number (for backward compatibility)
+  partID?: string; // Backend UUID
   partName: string;
   partNumber: string;
   quantity: number;
   minStockLevel: number;
   unitCost?: number;
+  supplier?: string | null;
+  description?: string | null;
+  isLowStock?: boolean;
 }
 
 export default function MechanicInventoryPage() {
@@ -20,6 +26,8 @@ export default function MechanicInventoryPage() {
   const [showForm, setShowForm] = useState(false);
   const [parts, setParts] = useState<Part[]>([]);
   const [editingPart, setEditingPart] = useState<Part | null>(null);
+  const [deletingPart, setDeletingPart] = useState<Part | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     partName: "",
     partNumber: "",
@@ -29,6 +37,16 @@ export default function MechanicInventoryPage() {
   });
 
   useEffect(() => {
+    // Get user role from token
+    const token =
+      document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="))
+        ?.split("=")[1] || "";
+    if (token) {
+      const user = getUserFromToken(token);
+      setUserRole(user?.role ? String(user.role) : null);
+    }
     loadParts();
   }, []);
 
@@ -57,7 +75,9 @@ export default function MechanicInventoryPage() {
           ?.split("=")[1] || "";
 
       if (editingPart) {
-        await partsApi.update(editingPart.id, formData, token);
+        // Use partID (UUID) if available, otherwise fall back to id
+        const partId = editingPart.partID || editingPart.id;
+        await partsApi.update(partId, formData, token);
       } else {
         await partsApi.create(formData, token);
       }
@@ -89,36 +109,47 @@ export default function MechanicInventoryPage() {
     setShowForm(true);
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this part?")) return;
+  const handleDeleteClick = (part: Part) => {
+    setDeletingPart(part);
+  };
 
-    try {
-      const token =
-        document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("token="))
-          ?.split("=")[1] || "";
-      await partsApi.delete(id, token);
-      await loadParts();
-    } catch {
-      alert("Failed to delete part");
-    }
+  const handleDeleteConfirm = async () => {
+    if (!deletingPart) return;
+
+    const token =
+      document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="))
+        ?.split("=")[1] || "";
+    const partId = deletingPart.partID || deletingPart.id;
+    await partsApi.delete(partId, token);
+    setDeletingPart(null);
+    await loadParts();
+  };
+
+  const handleDeleteCancel = () => {
+    setDeletingPart(null);
   };
 
   const getLowStockParts = () => {
-    return parts.filter((part: Part) => part.quantity <= part.minStockLevel);
+    return parts.filter(
+      (part: Part) => part.isLowStock ?? part.quantity <= part.minStockLevel
+    );
   };
 
   const getStockStatusColor = (part: Part) => {
+    // Use backend isLowStock if available, otherwise calculate
+    const isLow = part.isLowStock ?? part.quantity <= part.minStockLevel;
     if (part.quantity === 0) return "bg-red-100 text-red-800 border-red-200";
-    if (part.quantity <= part.minStockLevel)
-      return "bg-yellow-100 text-yellow-800 border-yellow-200";
+    if (isLow) return "bg-yellow-100 text-yellow-800 border-yellow-200";
     return "bg-green-100 text-green-800 border-green-200";
   };
 
   const getStockStatus = (part: Part) => {
+    // Use backend isLowStock if available, otherwise calculate
+    const isLow = part.isLowStock ?? part.quantity <= part.minStockLevel;
     if (part.quantity === 0) return "Out of Stock";
-    if (part.quantity <= part.minStockLevel) return "Low Stock";
+    if (isLow) return "Low Stock";
     return "In Stock";
   };
 
@@ -369,9 +400,9 @@ export default function MechanicInventoryPage() {
       {/* Parts Grid */}
       {parts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {parts.map((part) => (
+          {parts.map((part, index) => (
             <Card
-              key={part.id}
+              key={part.partID || part.id || part.partNumber || `part-${index}`}
               className="border-2 hover:border-purple-200 hover:shadow-lg transition-all"
             >
               <CardContent className="p-6">
@@ -443,7 +474,7 @@ export default function MechanicInventoryPage() {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => handleDelete(part.id)}
+                    onClick={() => handleDeleteClick(part)}
                     className="text-red-600 hover:bg-red-50 hover:border-red-300"
                   >
                     <svg
@@ -487,6 +518,16 @@ export default function MechanicInventoryPage() {
             </p>
           </CardContent>
         </Card>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deletingPart && (
+        <DeletePartModal
+          partName={deletingPart.partName}
+          partNumber={deletingPart.partNumber}
+          onClose={handleDeleteCancel}
+          onConfirm={handleDeleteConfirm}
+        />
       )}
     </div>
   );
